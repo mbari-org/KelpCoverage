@@ -206,7 +206,7 @@ def run_sahi_sam_visualization( image_path: str, processor: Any, results_dir: st
     image_base = os.path.splitext(os.path.basename(image_path))[0]
 
     if not site_name:
-        site_name = "default_site"
+        site_name = "error"
 
     if not coverage_only:
         viz_dir = os.path.join(results_dir, site_name, "visualizations", param_string)
@@ -222,7 +222,6 @@ def run_sahi_sam_visualization( image_path: str, processor: Any, results_dir: st
             _create_threshold_visualization(model_for_viz, image_path, image_base, viz_dir)
     
     results, slice_info = processor.process_image(image_path)
-    
     full_mask = processor.reconstruct_full_mask(results, slice_info, image_path=image_path, coverage_only=False)
     
     if full_mask is None:

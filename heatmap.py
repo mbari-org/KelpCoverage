@@ -37,10 +37,10 @@ def generate_heatmap(coverage_csv: str, site_prefix: str,
     gdf_pts_mercator = gdf_pts.to_crs(epsg=3857)
     gdf_pts_mercator['geometry'] = gdf_pts_mercator.geometry.buffer(20)
 
-    the_grid = _create_analysis_grid(gdf_pts_mercator, cell_size=grid_cell_size)
-    the_grid = the_grid.reset_index().rename(columns={'index': 'grid_id'})
+    grid= _create_analysis_grid(gdf_pts_mercator, cell_size=grid_cell_size)
+    grid= grid.reset_index().rename(columns={'index': 'grid_id'})
 
-    intersection = gpd.overlay(the_grid, gdf_pts_mercator, how='intersection')
+    intersection = gpd.overlay(grid, gdf_pts_mercator, how='intersection')
     intersection['area'] = intersection.geometry.area
     intersection['weighted_cov'] = intersection['coverage_percentage'] * intersection['area']
 
@@ -49,7 +49,7 @@ def generate_heatmap(coverage_csv: str, site_prefix: str,
         area_sum=('area', 'sum')
     )
     weighted_mean = (grouped['weighted_cov_sum'] / grouped['area_sum']).rename('coverage_percentage')
-    grid_final = the_grid.join(weighted_mean, on='grid_id')
+    grid_final = grid.join(weighted_mean, on='grid_id')
 
     grid_to_plot = grid_final.dropna(subset=['coverage_percentage'])
     if grid_to_plot.empty:
@@ -64,7 +64,7 @@ def generate_heatmap(coverage_csv: str, site_prefix: str,
         legend_kwds={'label': "Area-Weighted Kelp Coverage %", "orientation": "horizontal", "pad": 0.01, "shrink": 0.4}
     )
 
-    gdf_coverage_proj = gdf_pts.to_crs(the_grid.crs)
+    gdf_coverage_proj = gdf_pts.to_crs(grid.crs)
 
     if show_points:
         gdf_coverage_proj.plot(ax=ax, marker='o', color='red', markersize=20)
@@ -94,8 +94,10 @@ def generate_heatmap(coverage_csv: str, site_prefix: str,
     ax.set_axis_off()
     ax.set_title(f"{site_prefix} Heatmap", fontsize=30)
 
-    if output_path:
-        plt.savefig(output_path, dpi=300, bbox_inches='tight')
-        print(f"Heatmap saved to {output_path}")
-    else:
-        plt.show()
+    if not output_path:
+        default_dir = os.path.join("results", "heatmap")
+        os.makedirs(default_dir, exist_ok=True)
+        output_path = os.path.join(default_dir, f"{site_prefix}_heatmap.png")
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    print(f"Heatmap saved to {output_path}")
+    plt.close(fig)

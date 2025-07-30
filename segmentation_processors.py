@@ -93,6 +93,8 @@ class HierarchicalProcessor:
         self.post_erosion_mask: Optional[np.ndarray] = None
 
     def _image_to_lab_gpu(self, rgb_tensor: torch.Tensor) -> torch.Tensor:
+        # rgb to lab code taken from cv2 implementation
+        # https://github.com/opencv/opencv/blob/7ab4e1bf56849e9c5584ce1400adf9705710ca32/modules/ts/misc/color.py#L191
         rgb_norm = rgb_tensor.float() / 255.0
         r, g, b = rgb_norm[..., 0], rgb_norm[..., 1], rgb_norm[..., 2]
 
