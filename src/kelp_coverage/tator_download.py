@@ -5,7 +5,7 @@ import pandas as pd
 import urllib3
 from typing import Dict, Tuple, Optional
 
-from pixel_analysis import find_representative_lab_color, extract_location
+from .pixel_analysis import find_representative_lab_color, extract_location
 
 # hacky way to get rid of error msg for now
 urllib3.disable_warnings()

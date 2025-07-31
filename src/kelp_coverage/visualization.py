@@ -3,13 +3,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
-from typing import List, Tuple, Dict, Any, Optional
 import torch
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
-from segmentation_processors import HierarchicalProcessor, SinglePassProcessor
-from sahisam import SAHISAM
+
+from typing import List, Tuple, Dict, Any, Optional
 from matplotlib.patches import Patch
+
+from .segmentation_processors import HierarchicalProcessor, SinglePassProcessor
+from .sahisam import SAHISAM
 
 def _calculate_coverage(mask: np.ndarray) -> float:
     if mask.size == 0:

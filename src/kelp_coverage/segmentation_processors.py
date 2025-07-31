@@ -2,9 +2,10 @@ import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
-from sahisam import SAHISAM
 import pprint
+
 from typing import Tuple, Dict, Any, Optional
+from .sahisam import SAHISAM
 
 class SinglePassProcessor:
     def __init__(self, model_args: Any, water_lab: Tuple[int, int, int]):

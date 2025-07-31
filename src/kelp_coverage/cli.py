@@ -6,10 +6,11 @@ import random
 from tqdm import tqdm
 from typing import List, Dict, Tuple, Optional, Any
 
-from tator_download import download_images_and_get_pixels
-from visualization import run_sahi_sam_visualization
-from segmentation_processors import SinglePassProcessor, HierarchicalProcessor
-from sahisam import SAHISAM
+from .tator_download import download_images_and_get_pixels
+from .visualization import run_sahi_sam_visualization
+from .segmentation_processors import SinglePassProcessor, HierarchicalProcessor
+from .sahisam import SAHISAM
+from .heatmap import generate_heatmap
 
 def _ensure_directories(results_dir: str = "results", images_dir: str = "images") -> None:
     os.makedirs(results_dir, exist_ok=True)
