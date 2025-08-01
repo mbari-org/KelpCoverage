@@ -95,8 +95,6 @@ class SAHISAM:
             new_height = int(img.shape[0] / self.downsample_factor)
             img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_AREA)
         if self.clahe:
-            print("--" * 50)
-            print("NOOOOOO")
             lab = cv2.cvtColor(img, cv2.COLOR_RGB2LAB)
             l, a, b = cv2.split(lab)
             clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
