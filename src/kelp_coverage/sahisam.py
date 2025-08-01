@@ -293,13 +293,17 @@ class SAHISAM:
         is_shortcut = (uniform_pct >= self.uniform_grid_thresh and water_pct >= self.water_grid_thresh)
         return is_shortcut, uniform_pct, water_pct
     
-    def _create_debug_visualization(self, slice_img: np.ndarray, current_threshold: int, image_path: str, slice_index: int, output_dir: str, diagnostics: Dict[str, Any], show_heatmap: bool = False, show_stages: bool = False, is_shortcut: bool = False) -> None:
+    def _create_debug_visualization(self, slice_img: np.ndarray, current_threshold: int, image_path: str, slice_index: int, 
+                                    output_dir: str, diagnostics: Dict[str, Any], show_heatmap: bool = False, show_stages: bool = False, is_shortcut: bool = False) -> None:
         selected_points_xy, _ = self._select_prompt_points_from_grid(slice_img, return_diagnostics=False, threshold=current_threshold)
-        initial_candidates, grid_filtered_candidates = diagnostics["initial_candidates"], diagnostics["grid_filtered_candidates"]
-        uniform_grids, water_color_grids, valid_water_grids = diagnostics["uniform_grids"], diagnostics["water_color_grids"], diagnostics["valid_water_grids"]
-        
+        initial_candidates = diagnostics.get("initial_candidates", np.array([]))
+        grid_filtered_candidates = diagnostics.get("grid_filtered_candidates", np.array([]))
+        uniform_grids = diagnostics.get("uniform_grids")
+        water_color_grids = diagnostics.get("water_color_grids")
+        valid_water_grids = diagnostics.get("valid_water_grids")
+
         plot_candidates = []
-        if len(initial_candidates) > 0:
+        if len(initial_candidates) > 0 and valid_water_grids is not None:
             grid_indices_y, grid_indices_x = initial_candidates[:, 0] // self.grid_size, initial_candidates[:, 1] // self.grid_size
             grid_h, grid_w = valid_water_grids.shape
             plot_candidates_list = []
@@ -314,24 +318,87 @@ class SAHISAM:
                             plot_candidates_list.append(grid_candidates[sample_indices])
             if plot_candidates_list:
                 plot_candidates = np.vstack(plot_candidates_list)
-        
-        plot_label = f"Initial ({len(plot_candidates)} of {len(initial_candidates)})"
-        
+
+        image_base = os.path.splitext(os.path.basename(image_path))[0]
+        base_save_path = os.path.join(output_dir, f"{image_base}_slice_{slice_index}_thresh{current_threshold}")
+
+        if uniform_grids is not None and water_color_grids is not None:
+            fig, ax = plt.subplots(figsize=(8, 8))
+            ax.imshow(slice_img)
+            grid_h, grid_w = uniform_grids.shape
+            for r in range(grid_h):
+                for c in range(grid_w):
+                    is_uniform, is_water_color = uniform_grids[r, c], water_color_grids[r, c]
+                    color = 'green' if is_uniform and is_water_color else ('purple' if is_uniform else 'red')
+                    ax.add_patch(Rectangle((c*self.grid_size, r*self.grid_size), self.grid_size, self.grid_size, facecolor=color, alpha=0.3, edgecolor='white', lw=0.5))
+            legend_elements = [
+                Patch(facecolor='green', alpha=0.3, label='Valid Grid (Uniform & Water Color)'),
+                Patch(facecolor='purple', alpha=0.3, label='Uniform Only'),
+                Patch(facecolor='red', alpha=0.3, label='Non-Uniform')
+            ]
+            ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), fancybox=True, shadow=True, ncol=3)
+            ax.set_title(f"Grid Validation | Slice {slice_index}" + (" (Shortcut)" if is_shortcut else ""), loc='center')
+            ax.axis('off')
+            ax.margins(0.01)
+            plt.savefig(f"{base_save_path}_stage1_grid_validation.png", bbox_inches='tight', dpi=200)
+            plt.close(fig)
+
+        if uniform_grids is not None and water_color_grids is not None:
+            fig, ax = plt.subplots(figsize=(8, 8))
+            ax.imshow(slice_img)
+            grid_h, grid_w = uniform_grids.shape
+            for r in range(grid_h):
+                for c in range(grid_w):
+                    is_uniform, is_water_color = uniform_grids[r, c], water_color_grids[r, c]
+                    color = 'green' if is_uniform and is_water_color else ('purple' if is_uniform else 'red')
+                    ax.add_patch(Rectangle((c*self.grid_size, r*self.grid_size), self.grid_size, self.grid_size, facecolor=color, alpha=0.3, edgecolor='white', lw=0.5))
+            
+            if len(plot_candidates) > 0: ax.scatter(plot_candidates[:, 1], plot_candidates[:, 0], c='gray', s=15, alpha=0.6)
+            if len(grid_filtered_candidates) > 0: ax.scatter(grid_filtered_candidates[:, 1], grid_filtered_candidates[:, 0], c='orange', s=30, edgecolor='black', lw=0.5)
+
+            legend_elements = [
+                Patch(facecolor='green', alpha=0.3, label='Valid Grid'),
+                plt.Line2D([0], [0], marker='o', color='w', label=f'Unselected Points ({len(plot_candidates)} | {len(initial_candidates)})', markerfacecolor='gray', markersize=10),
+                plt.Line2D([0], [0], marker='o', color='w', label=f'Grid Filtered ({len(grid_filtered_candidates)})', markerfacecolor='orange', markersize=10)
+            ]
+            ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), fancybox=True, shadow=True, ncol=3)
+            ax.set_title(f"Point Selection over Grid | Slice {slice_index}", loc='center')
+            ax.axis('off')
+            ax.margins(0.01)
+            plt.savefig(f"{base_save_path}_stage2_point_selection.png", bbox_inches='tight', dpi=200)
+            plt.close(fig)
+
         fig, ax = plt.subplots(figsize=(8, 8))
         ax.imshow(slice_img)
-        legend_elements = []
+        if len(grid_filtered_candidates) > 0: ax.scatter(grid_filtered_candidates[:, 1], grid_filtered_candidates[:, 0], c='orange', s=30, alpha=0.4)
+        if selected_points_xy is not None and len(selected_points_xy) > 0:
+            ax.scatter(selected_points_xy[:, 0], selected_points_xy[:, 1], c='red', s=60, marker='X', edgecolor='white', lw=1)
         
+        legend_elements = [
+            plt.Line2D([0], [0], marker='o', color='w', label=f'Grid Filtered Pool ({len(grid_filtered_candidates)})', markerfacecolor='orange', alpha=0.4, markersize=10),
+            plt.Line2D([0], [0], marker='X', color='w', label=f'Final Prompts ({len(selected_points_xy)})', markerfacecolor='red', markersize=12)
+        ]
+        ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), fancybox=True, shadow=True, ncol=3)
+        ax.set_title(f"Final Point Selection | Slice {slice_index}", loc='center')
+        ax.axis('off')
+        ax.margins(0.01)
+        plt.savefig(f"{base_save_path}_stage3_final_selection.png", bbox_inches='tight', dpi=200)
+        plt.close(fig)
+
+        fig, ax = plt.subplots(figsize=(10, 10))
+        ax.imshow(slice_img)
+        legend_elements = []
+
         if show_heatmap:
             lab_tensor = self._get_lab_tensor(slice_img)
             dist_map = torch.linalg.norm(lab_tensor - self.water_lab_tensor, dim=2).cpu().numpy()
             vmax = current_threshold * 2
             norm = mcolors.Normalize(vmin=0, vmax=vmax)
-            masked_array = np.ma.masked_where(dist_map > vmax, dist_map)
             cmap = cm.get_cmap('viridis_r')
-            ax.imshow(masked_array, alpha=0.5, cmap=cmap, norm=norm)
+            ax.imshow(np.ma.masked_where(dist_map > vmax, dist_map), alpha=0.5, cmap=cmap, norm=norm)
             legend_elements.append(Patch(facecolor=cmap(0.5), alpha=0.5, label=f'Color Distance (<= {vmax})'))
-            
-        if show_stages:
+        
+        if uniform_grids is not None and water_color_grids is not None:
             grid_h, grid_w = uniform_grids.shape
             for r in range(grid_h):
                 for c in range(grid_w):
@@ -339,29 +406,30 @@ class SAHISAM:
                     color = 'green' if is_uniform and is_water_color else ('purple' if is_uniform else 'red')
                     ax.add_patch(Rectangle((c*self.grid_size, r*self.grid_size), self.grid_size, self.grid_size, facecolor=color, alpha=0.25, edgecolor='white', lw=0.5))
             legend_elements.extend([Patch(facecolor='green', alpha=0.3, label='Valid Grid'), Patch(facecolor='purple', alpha=0.3, label='Uniform Grid'), Patch(facecolor='red', alpha=0.3, label='Non-Uniform Grid')])
-            if len(plot_candidates) > 0: ax.scatter(plot_candidates[:, 1], plot_candidates[:, 0], c='yellow', s=15, alpha=0.6)
-            if len(grid_filtered_candidates) > 0: ax.scatter(grid_filtered_candidates[:, 1], grid_filtered_candidates[:, 0], c='orange', s=30, edgecolor='black', lw=0.5)
-            legend_elements.extend([plt.Line2D([0], [0], marker='o', color='w', label=plot_label, markerfacecolor='yellow', markersize=10), plt.Line2D([0], [0], marker='o', color='w', label=f'Grid Filtered ({len(grid_filtered_candidates)})', markerfacecolor='orange', markersize=10)])
-        else:
-            if len(plot_candidates) > 0: ax.scatter(plot_candidates[:, 1], plot_candidates[:, 0], c='gray', s=15, alpha=0.6)
-            legend_elements.append(plt.Line2D([0], [0], marker='o', color='w', label=plot_label, markerfacecolor='gray', markersize=10))
+
+        if len(plot_candidates) > 0:
+            ax.scatter(plot_candidates[:, 1], plot_candidates[:, 0], c='yellow', s=15, alpha=0.6)
+            legend_elements.append(plt.Line2D([0], [0], marker='o', color='w', label=f'Sampled Initial ({len(plot_candidates)} of {len(initial_candidates)})', markerfacecolor='yellow', markersize=10))
+        
+        if len(grid_filtered_candidates) > 0:
+            ax.scatter(grid_filtered_candidates[:, 1], grid_filtered_candidates[:, 0], c='orange', s=30, edgecolor='black', lw=0.5)
+            legend_elements.append(plt.Line2D([0], [0], marker='o', color='w', label=f'Grid Filtered ({len(grid_filtered_candidates)})', markerfacecolor='orange', markersize=10))
 
         if selected_points_xy is not None and len(selected_points_xy) > 0:
             ax.scatter(selected_points_xy[:, 0], selected_points_xy[:, 1], c='red', s=60, marker='X', edgecolor='white', lw=1)
-            legend_elements.append(plt.Line2D([0], [0], marker='X', color='w', label=f'Final Selection ({len(selected_points_xy)})', markerfacecolor='red', markersize=12))
-            
-        title_str = f"Debug: {os.path.basename(image_path)} - Slice {slice_index}" + (" (Shortcut)" if is_shortcut else "")
-        ax.set_title(title_str)
-        ax.axis('off')
-        ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=3)
-        
-        image_base = os.path.splitext(os.path.basename(image_path))[0]
-        output_path = os.path.join(output_dir, f"{image_base}_slice_{slice_index}_thresh{current_threshold}.png")
-        plt.savefig(output_path, bbox_inches='tight', dpi=200)
-        plt.close(fig)
-        print(f"\nSaved debug visualization to: {output_path}")
+            legend_elements.append(plt.Line2D([0], [0], marker='X', color='w', label=f'Final Prompts ({len(selected_points_xy)})', markerfacecolor='red', markersize=12))
 
-    def _generate_debug_visualization(self, slice_img: np.ndarray, image_path: str, slice_index: int, diagnostics: Dict[str, Any], output_dir: str, show_heatmap: bool, show_stages: bool, debug_threshold: Optional[int]) -> None:
+        ax.set_title(f"Final Composite Overlay | Slice {slice_index}" + (" (Shortcut)" if is_shortcut else ""), loc='center')
+        ax.axis('off')
+        ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), fancybox=True, shadow=True, ncol=3)
+        ax.margins(0.01)
+        plt.savefig(f"{base_save_path}_stage4_final_overlay.png", bbox_inches='tight', dpi=200)
+        plt.close(fig)
+
+        print(f"Saved 4 debug visualization stages to: {os.path.dirname(base_save_path)}")
+
+    def _generate_debug_visualization(self, slice_img: np.ndarray, image_path: str, slice_index: int, diagnostics: Dict[str, Any], 
+                                      output_dir: str, show_heatmap: bool, show_stages: bool, debug_threshold: Optional[int]) -> None:
         is_shortcut, uniform_pct, water_pct = self._check_shortcut_condition(diagnostics)
         used_threshold = diagnostics.get('final_threshold_used') or debug_threshold or self.threshold
         if self.verbose:
@@ -473,4 +541,3 @@ class SAHISAM:
             return full_mask_gpu
         else:
             return full_mask_gpu.cpu().numpy()
-

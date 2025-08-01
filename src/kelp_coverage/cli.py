@@ -264,7 +264,7 @@ def main() -> None:
     # --- Analyze Parser ---
     analyze_parser = subparsers.add_parser('analyze', parents=[base_parser], help='Run the kelp segmentation analysis on a directory of images.')
     analyze_parser.add_argument('--site', type=str, help='Specify specific site to process. Processes all sites if omitted.')
-    analyze_parser.add_argument('--tator-csv', type=str, default='tator_data.csv', help='Path to the CSV to link results with metadata.')
+    analyze_parser.add_argument('--tator-csv', type=str, required=True, help='Required path to the CSV to link results with metadata.')
     analyze_parser.add_argument('--images', type=str, help='A comma-separated list of specific image filenames to process.')
     analyze_parser.add_argument('--count', type=int, default=-1, help='Number of images to randomly select and process from each site. -1 for all images(default).')
     analyze_parser.add_argument('--generate-overlay', action='store_true', help='Generate and save a transparent overlay of the kelp mask on the original image.')
