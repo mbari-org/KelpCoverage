@@ -15,7 +15,7 @@ def _create_analysis_grid(gdf: gpd.GeoDataFrame, cell_size: int = 50) -> gpd.Geo
             grid.append(Polygon([(x, y), (x + cell_size, y), (x + cell_size, y + cell_size), (x, y + cell_size)]))
     return gpd.GeoDataFrame({'geometry': grid}, crs="EPSG:3857")
 
-def generate_heatmap(coverage_csv: str, site_prefix: str,
+def generate_heatmap(coverage_csv: str, 
                      output_path: Optional[str] = None,
                      grid_cell_size: int = 30,
                      figsize: tuple = (20, 20),
@@ -27,7 +27,7 @@ def generate_heatmap(coverage_csv: str, site_prefix: str,
                      title_fontsize: int = 50):
 
     df_coverage = pd.read_csv(coverage_csv)
-    df_coverage = df_coverage[df_coverage['image_name'].str.startswith(site_prefix)].copy()
+    site_prefix = df_coverage['image_name'].iloc[0].split('_')[1]
     df_coverage['longitude'] = df_coverage['longitude'].abs() * -1
     df_coverage['num_id'] = df_coverage['image_name'].str.split('_').str[-1].str.replace(r'DSC|\.JPG', '', regex=True)
 
@@ -105,7 +105,6 @@ def generate_heatmap(coverage_csv: str, site_prefix: str,
     ax.set_axis_off()
     ax.set_title(f"{site_prefix} Heatmap", fontsize=title_fontsize)
 
-    # Reverted: Always save the plot, creating a default path if none is given.
     if not output_path:
         default_dir = os.path.join("results", "heatmap")
         os.makedirs(default_dir, exist_ok=True)

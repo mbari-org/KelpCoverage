@@ -208,7 +208,8 @@ def _run_debug(args: argparse.Namespace) -> None:
 def _run_heatmap(args: argparse.Namespace) -> None:
     print("Generating heatmap...")
     generate_heatmap(
-        coverage_csv=args.coverage_data, site_prefix=args.site_prefix, output_path=args.output,
+        coverage_csv=args.coverage_data, 
+        output_path=args.output,
         grid_cell_size=args.grid_size,
         show_grid_values=args.show_grid_values,
         show_points=args.show_points,
@@ -294,7 +295,6 @@ def main() -> None:
     # --- Heatmap Parser ---
     heatmap_parser = subparsers.add_parser('heatmap', help='Generate a spatial heatmap from coverage data.')
     heatmap_parser.add_argument('--coverage-data', type=str, required=True, help='Path to the combined coverage CSV file.')
-    heatmap_parser.add_argument('--site-prefix', type=str, required=True, help='Site prefix to filter images ("trinity-2_20250404T17383").')
     heatmap_parser.add_argument('--output', type=str, help='Path to save the output heatmap image. Defaults to "results/heatmap/".')
     heatmap_parser.add_argument('--grid-size', type=int, default=30, help='Size of heatmap grid cells.')
     heatmap_parser.add_argument('--show-grid-values', action='store_true', help='Show numerical coverage values on the grid cells.')
