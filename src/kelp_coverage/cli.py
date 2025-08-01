@@ -16,7 +16,9 @@ def _ensure_directories(results_dir: str = "results", images_dir: str = "images"
     os.makedirs(results_dir, exist_ok=True)
     os.makedirs(images_dir, exist_ok=True)
 
-def _save_pixel_data(loc_to_pixel: Dict[str, Tuple[int, int, int]], csv_path: str) -> None:
+def _save_pixel_data(loc_to_pixel: Optional[Dict[str, Tuple[int, int, int]]], csv_path: str) -> None:
+    if not loc_to_pixel:
+        return
     pixel_data = [{'location': loc, 'L': p[0], 'A': p[1], 'B': p[2]} for loc, p in loc_to_pixel.items() if p]
     if not pixel_data:
         print("No pixel data to save.")
@@ -45,7 +47,7 @@ def _get_image_paths(args: argparse.Namespace, site_path: str) -> List[str]:
             return paths
 
 def _build_param_string(args: argparse.Namespace) -> str:
-    param_string = f"slice{args.slice_size}_pts{args.num_points}_{'mobile' if args.use_mobile_sam else args.sam_model}"
+    param_string = f"slice{args.slice_size}_pts{args.num_points}_{'mobile' if args.use_mobile_sam else args.sam_model_type}"
     if args.hierarchical:
         param_string += f"_hierarchical{getattr(args, 'hierarchical_slice_size', 4096)}"
         if args.use_erosion_merge and args.use_color_validation:
@@ -60,9 +62,10 @@ def _setup_data(args: argparse.Namespace) -> None:
     results_dir = "results"
     images_dir = "images"
     _ensure_directories(results_dir, images_dir)
-    pixel_csv_path = os.path.join(results_dir, args.pixel_csv)
+    pixel_csv_path = os.path.join(results_dir, "pixel_values.csv")
     loc_to_pixel = download_images_and_get_pixels(
         file_path=args.tator_csv,
+        tator_token=args.tator_token,
         images_dir=images_dir,
         images_per_location=args.images,
         start_idx=args.start_idx,
@@ -171,7 +174,7 @@ def _run_debug(args: argparse.Namespace) -> None:
     water_lab = loc_to_pixel[args.site]
     model = SAHISAM(
         sam_checkpoint=args.sam_checkpoint,
-        sam_model_type=args.sam_model,
+        sam_model_type=args.sam_model_type,
         water_lab=water_lab,
         use_mobile_sam=args.use_mobile_sam,
         slice_size=args.slice_size,
@@ -179,14 +182,11 @@ def _run_debug(args: argparse.Namespace) -> None:
         num_points=args.num_points,
         threshold=args.threshold,
         threshold_max=args.threshold_max,
-        threshold_step=args.threshold_step,
-        validate_points=args.validate_points,
         verbose=args.verbose,
         final_point_strategy=args.final_point_strategy,
         grid_size=args.grid_size,
         uniformity_check=args.uniformity_check,
         uniformity_std_threshold=args.uniformity_std_threshold,
-        use_grid_uniformity=args.use_grid_uniformity,
         uniform_grid_thresh=args.uniform_grid_thresh,
         water_grid_thresh=args.water_grid_thresh,
         points_per_grid=args.points_per_grid
@@ -200,7 +200,6 @@ def _run_debug(args: argparse.Namespace) -> None:
             image_path=image_path,
             visualize_slice_indices=args.slice_index,
             visualize_output_dir=debug_dir,
-            debug_threshold=args.debug_threshold,
             visualize_heatmap=args.heatmap,
             visualize_stages=args.visualize_stages,
         )
@@ -210,8 +209,10 @@ def _run_heatmap(args: argparse.Namespace) -> None:
     print("Generating heatmap...")
     generate_heatmap(
         coverage_csv=args.coverage_data, site_prefix=args.site_prefix, output_path=args.output,
-        grid_cell_size=args.grid_size, show_grid_values=args.show_grid_values,
-        show_points=args.show_points, show_point_labels=args.show_point_labels
+        grid_cell_size=args.grid_size,
+        show_grid_values=args.show_grid_values,
+        show_points=args.show_points,
+        show_point_labels=args.show_point_labels
     )
 
 def main() -> None:
@@ -222,23 +223,45 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest='command', help='Available commands', required=True)
 
     base_parser = argparse.ArgumentParser(add_help=False)
-    base_parser.add_argument('--sam-checkpoint', type=str, required=True, help='Path to the downloaded SAM model checkpoint.')
-    base_parser.add_argument('--use-mobile-sam', action=argparse.BooleanOptionalAction, default=True, help='Use the lightweight MobileSAM model (default). --no-use-mobile-sam to utilize the original SAM model')
-    base_parser.add_argument('--sam-model-type', type=str, default='vit_h', help='Model type for standard SAM (e.g., vit_h, vit_l, vit_b). Ignored if --use-mobile-sam is active.')
-    base_parser.add_argument('--pixel-csv', type=str, default='pixel_values.csv', help='Path to the CSV file storing representative LAB pixel values for each site.')
+    
+    # Core Model and Slicing Arguments
+    base_parser.add_argument('--sam-checkpoint', type=str, default='mobile_sam.pt',  help='Path to the downloaded SAM model checkpoint. Defaults to MobileSAM model')
+    base_parser.add_argument('--use-mobile-sam', action=argparse.BooleanOptionalAction, default=True, help='Use the lightweight MobileSAM model (default). Use --no-use-mobile-sam for the original SAM model.')
+    base_parser.add_argument('--sam-model-type', type=str, default='vit_h', help='Model type for standard SAM (e.g., vit_h, vit_l, vit_b). Ignored if using MobileSAM.')
     base_parser.add_argument('--slice-size', type=int, default=1024, help='Size of the slices generated by SAHI.')
+    base_parser.add_argument('--slice-overlap', type=float, default=0.2, help='Overlap ratio between adjacent slices (0.0 to 1.0).')
+    base_parser.add_argument('--padding', type=int, default=0, help='Pixel padding to add to each slice before processing.')
+    
+    # Pre-processing Arguments
+    base_parser.add_argument('--clahe', action='store_true', help='Apply Contrast Limited Adaptive Histogram Equalization (CLAHE) to images before processing.')
+    base_parser.add_argument('--downsample-factor', type=float, default=1.0, help='Factor by which to downsample the image (e.g., 2.0 for half size).')
+    
+    # Point Selection and Filtering Arguments
+    base_parser.add_argument('--pixel-csv', type=str, default='pixel_values.csv', help='Path to the CSV file storing representative LAB pixel values for each site.')
     base_parser.add_argument('--num-points', type=int, default=3, help='Number of seed points provided to SAM for segmentation.')
     base_parser.add_argument('--threshold', type=int, default=25, help='Threshold for LAB color distance to identify water pixels.')
     base_parser.add_argument('--threshold-max', type=int, default=30, help='Maximum LAB color threshold to search up to if no points are found.')
+    base_parser.add_argument('--final-point-strategy', type=str, default='poisson_disk', choices=['poisson_disk', 'center_bias', 'random'], help='Algorithm for selecting the final prompt points.')
+    base_parser.add_argument('--grid-size', type=int, default=64, help='Pixel size of the grid used for initial point filtering.')
+    base_parser.add_argument('--uniformity-check', action=argparse.BooleanOptionalAction, default=True, help='Enable/disable the grid uniformity check during point selection.')
+    base_parser.add_argument('--uniformity-std-threshold', type=float, default=4.0, help='Standard deviation threshold for a grid cell to be considered "uniform".')
+    
+    # Shortcut Arguments
+    base_parser.add_argument('--uniform-grid-thresh', type=float, default=0.98, help='Percentage of uniform grids required to shortcut SAM.')
+    base_parser.add_argument('--water-grid-thresh', type=float, default=0.98, help='Percentage of water-colored grids required to shortcut SAM.')
+
     base_parser.add_argument('--verbose', '-v', action='store_true', help='Verbose output')
 
-    setup_parser = subparsers.add_parser('setup', help='Download images and compute representative water pixel for each site.')
+    # --- Setup Parser ---
+    setup_parser = subparsers.add_parser('setup', parents=[base_parser], help='Download images and compute representative water pixel for each site.')
     setup_parser.add_argument('--tator-csv', type=str, default='tator_data.csv', help='Path to the image CSV file.')
+    setup_parser.add_argument('--tator-token', type=str, help='API token for Tator.')
     setup_parser.add_argument('--images', type=int, default=-1, help='Number of images to download per site. -1 for all images (default).')
     setup_parser.add_argument('--visualize', action='store_true', help='Display histograms of the LAB color channels for each site.')
     setup_parser.add_argument('--start-idx', type=int, help='Optional start index for images to process from CSV.')
     setup_parser.add_argument('--end-idx', type=int, help='Optional end index for images to process from CSV.')
 
+    # --- Analyze Parser ---
     analyze_parser = subparsers.add_parser('analyze', parents=[base_parser], help='Run the kelp segmentation analysis on a directory of images.')
     analyze_parser.add_argument('--site', type=str, help='Specify specific site to process. Processes all sites if omitted.')
     analyze_parser.add_argument('--tator-csv', type=str, default='tator_data.csv', help='Path to the CSV to link results with metadata.')
@@ -258,6 +281,7 @@ def main() -> None:
     analyze_parser.add_argument('--overwrite', action='store_true', help='Overwrite existing results for a site.')
     analyze_parser.add_argument('--coverage-only', action='store_true', help='Only compute and save coverage values.')
 
+    # --- Debug Parser ---
     debug_parser = subparsers.add_parser('debug-slice', parents=[base_parser], help='Detailed debug analysis on specific image slices.')
     debug_parser.add_argument('--image-path', type=str, required=True, nargs='+', help='One or more full paths to images to debug.')
     debug_parser.add_argument('--slice-index', type=int, required=True, nargs='+', help='One or more slice indices to debug for each image.')
@@ -267,14 +291,15 @@ def main() -> None:
     debug_parser.add_argument('--visualize-stages', action='store_true', help='Visualize the point filtering pipeline step-by-step.')
     debug_parser.add_argument('--points-per-grid', type=int, default=10, help='Number of candidate points to show per valid grid cell in debug mode.')
 
+    # --- Heatmap Parser ---
     heatmap_parser = subparsers.add_parser('heatmap', help='Generate a spatial heatmap from coverage data.')
     heatmap_parser.add_argument('--coverage-data', type=str, required=True, help='Path to the combined coverage CSV file.')
     heatmap_parser.add_argument('--site-prefix', type=str, required=True, help='Site prefix to filter images ("trinity-2_20250404T17383").')
-    heatmap_parser.add_argument('--output', type=str, help='Path to save the output heatmap image.')
-    heatmap_parser.add_argument('--grid-size', type=int, default=30, help='Size ofgrid cells.')
-    heatmap_parser.add_argument('--hide-grid-values', dest='show_grid_values', action='store_false', help='Hide numerical coverage values on the grid.')
-    heatmap_parser.add_argument('--hide-points', dest='show_points', action='store_false', help='Hide data points on the map.')
-    heatmap_parser.add_argument('--hide-point-labels', dest='show_point_labels', action='store_false', help='Hide labels for the data points.')
+    heatmap_parser.add_argument('--output', type=str, help='Path to save the output heatmap image. Defaults to "results/heatmap/".')
+    heatmap_parser.add_argument('--grid-size', type=int, default=30, help='Size of heatmap grid cells.')
+    heatmap_parser.add_argument('--show-grid-values', action='store_true', help='Show numerical coverage values on the grid cells.')
+    heatmap_parser.add_argument('--show-points', action='store_true', help='Show the location of data points on the map.')
+    heatmap_parser.add_argument('--show-point-labels', action='store_true', help='Show labels for the data points.')
 
     args = parser.parse_args()
 

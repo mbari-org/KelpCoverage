@@ -11,22 +11,22 @@ class SinglePassProcessor:
     def __init__(self, model_args: Any, water_lab: Tuple[int, int, int]):
         sahisam_args = {
             "sam_checkpoint": model_args.sam_checkpoint,
-            "sam_model_type": model_args.sam_model,
+            "sam_model_type": model_args.sam_model_type,
             "water_lab": water_lab,
             "use_mobile_sam": model_args.use_mobile_sam,
             "slice_size": model_args.slice_size,
+            "slice_overlap": model_args.slice_overlap,
             "padding": model_args.padding,
+            "clahe": model_args.clahe,
+            "downsample_factor": model_args.downsample_factor,
             "num_points": model_args.num_points,
             "threshold": model_args.threshold,
             "threshold_max": model_args.threshold_max,
-            "threshold_step": model_args.threshold_step,
-            "validate_points": model_args.validate_points,
             "verbose": model_args.verbose,
             "final_point_strategy": model_args.final_point_strategy,
             "grid_size": model_args.grid_size,
             "uniformity_check": model_args.uniformity_check,
             "uniformity_std_threshold": model_args.uniformity_std_threshold,
-            "use_grid_uniformity": model_args.use_grid_uniformity,
             "uniform_grid_thresh": model_args.uniform_grid_thresh,
             "water_grid_thresh": model_args.water_grid_thresh
         }
@@ -51,24 +51,24 @@ class HierarchicalProcessor:
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         common_sahisam_args = {
             "sam_checkpoint": model_args.sam_checkpoint,
-            "sam_model_type": model_args.sam_model,
+            "sam_model_type": model_args.sam_model_type,
             "water_lab": water_lab,
             "use_mobile_sam": model_args.use_mobile_sam,
+            "slice_overlap": model_args.slice_overlap,
             "padding": model_args.padding,
+            "clahe": model_args.clahe,
+            "downsample_factor": model_args.downsample_factor,
             "num_points": model_args.num_points,
             "threshold": model_args.threshold,
             "threshold_max": model_args.threshold_max,
-            "threshold_step": model_args.threshold_step,
-            "validate_points": model_args.validate_points,
             "verbose": model_args.verbose,
             "final_point_strategy": model_args.final_point_strategy,
             "grid_size": model_args.grid_size,
             "uniformity_check": model_args.uniformity_check,
             "uniformity_std_threshold": model_args.uniformity_std_threshold,
-            "use_grid_uniformity": model_args.use_grid_uniformity,
             "uniform_grid_thresh": model_args.uniform_grid_thresh,
             "water_grid_thresh": model_args.water_grid_thresh,
-            "device": self.device
+            "device": self.device,
         }
         fine_args = common_sahisam_args.copy()
         fine_args['slice_size'] = model_args.slice_size
@@ -96,8 +96,18 @@ class HierarchicalProcessor:
     def _image_to_lab_gpu(self, rgb_tensor: torch.Tensor) -> torch.Tensor:
         # rgb to lab code taken from cv2 implementation
         # https://github.com/opencv/opencv/blob/7ab4e1bf56849e9c5584ce1400adf9705710ca32/modules/ts/misc/color.py#L191
-        rgb_norm = rgb_tensor.float() / 255.0
-        r, g, b = rgb_norm[..., 0], rgb_norm[..., 1], rgb_norm[..., 2]
+
+        rgb_normalized = rgb_tensor.float() / 255.0
+
+        # Apply sRGB gamma de-correction to get linear RGB values
+        gamma_mask = rgb_normalized <= 0.04045
+        linear_rgb = torch.where(
+            gamma_mask,
+            rgb_normalized / 12.92,
+            torch.pow((rgb_normalized + 0.055) / 1.055, 2.4)
+        )
+
+        r, g, b = linear_rgb[..., 0], linear_rgb[..., 1], linear_rgb[..., 2]
 
         X = (0.412453 * r + 0.357580 * g + 0.180423 * b) / 0.950456
         Y = (0.212671 * r + 0.715160 * g + 0.072169 * b)
@@ -111,7 +121,7 @@ class HierarchicalProcessor:
         L = torch.where(Y > T, 116. * fY - 16.0, 903.3 * Y)
         a = 500. * (fX - fY)
         b = 200. * (fY - fZ)
-        
+
         return torch.stack([L, a, b], dim=-1)
 
     def _erode_gpu(self, kelp_mask_tensor: torch.Tensor, kernel_size: int) -> torch.Tensor:
@@ -187,7 +197,12 @@ class HierarchicalProcessor:
         if self.fine_model.verbose: print("--- [Hierarchical] GPU mask combination complete. ---")
         
         if coverage_only:
-            return self.fine_model.reconstruct_full_mask_gpu([ (combined_mask_gpu, []) ], {'original_shape': combined_mask_gpu.shape}, coverage_only=True)
+            total_pixels = combined_mask_gpu.numel()
+            if total_pixels == 0:
+                return 0.0
+            water_pixels = torch.sum(combined_mask_gpu)
+            kelp_pixels = total_pixels - water_pixels
+            return ((kelp_pixels.float() / total_pixels) * 100.0).item()
         else:
             return combined_mask_gpu.cpu().numpy()
 

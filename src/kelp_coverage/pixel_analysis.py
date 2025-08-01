@@ -73,4 +73,3 @@ def extract_location(filename: str) -> Optional[str]:
     if len(parts) >= 3:
         return f"{parts[0]}_{parts[1]}"
     return None
-

@@ -29,15 +29,12 @@ class SAHISAM:
                  num_points: int = 3,
                  threshold: int = 15,
                  threshold_max: int = 20,
-                 threshold_step: int = 1,
                  downsample_factor: float = 1.0,
-                 validate_points: bool = True,
                  use_mobile_sam: bool = False,
                  final_point_strategy: str = 'poisson_disk',
                  grid_size: int = 64,
                  uniformity_check: bool = True,
                  uniformity_std_threshold: float = 10.0,
-                 use_grid_uniformity: bool = True,
                  uniform_grid_thresh: float = 0.90,
                  water_grid_thresh: float = 0.95,
                  points_per_grid: int = 10
@@ -53,18 +50,15 @@ class SAHISAM:
         self.num_points = num_points
         self.threshold = threshold
         self.threshold_max = threshold_max
-        self.threshold_step = threshold_step
         self.downsample_factor = downsample_factor
-        self.validate_points = validate_points
         self.use_mobile_sam = use_mobile_sam
         self.final_point_strategy = final_point_strategy
         self.grid_size= grid_size
         self.uniformity_check = uniformity_check
         self.uniformity_std_threshold = uniformity_std_threshold
-        self.use_grid_uniformity = use_grid_uniformity
         self.uniform_grid_thresh = uniform_grid_thresh
         self.water_grid_thresh = water_grid_thresh
-        self.points_per_grid = points_per_grid
+        self.points_per_grid = points_per_grid 
 
         if self.use_mobile_sam:
             if self.verbose: print(f"Loading MobileSAM model from: {sam_checkpoint}")
@@ -101,6 +95,8 @@ class SAHISAM:
             new_height = int(img.shape[0] / self.downsample_factor)
             img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_AREA)
         if self.clahe:
+            print("--" * 50)
+            print("NOOOOOO")
             lab = cv2.cvtColor(img, cv2.COLOR_RGB2LAB)
             l, a, b = cv2.split(lab)
             clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
@@ -474,7 +470,7 @@ class SAHISAM:
                 return 0.0
             water_pixels = torch.sum(full_mask_gpu)
             kelp_pixels = total_pixels - water_pixels
-            return (kelp_pixels.float() / total_pixels) * 100
+            return ((kelp_pixels.float() / total_pixels) * 100.0).item()
         elif return_gpu_tensor:
             return full_mask_gpu
         else:

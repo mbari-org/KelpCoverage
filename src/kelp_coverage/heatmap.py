@@ -2,6 +2,7 @@ import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import contextily as ctx
+import os
 from shapely.geometry import Polygon
 import numpy as np
 from typing import Optional
@@ -21,7 +22,9 @@ def generate_heatmap(coverage_csv: str, site_prefix: str,
                      show_grid_values: bool = True,
                      show_points: bool = True,
                      show_point_labels: bool = True,
-                     map_buffer_percentage: float = 0.1):
+                     map_buffer_percentage: float = 0.1,
+                     colorbar_fontsize: int = 30,
+                     title_fontsize: int = 50):
 
     df_coverage = pd.read_csv(coverage_csv)
     df_coverage = df_coverage[df_coverage['image_name'].str.startswith(site_prefix)].copy()
@@ -35,12 +38,12 @@ def generate_heatmap(coverage_csv: str, site_prefix: str,
     )
 
     gdf_pts_mercator = gdf_pts.to_crs(epsg=3857)
-    gdf_pts_mercator['geometry'] = gdf_pts_mercator.geometry.buffer(20)
+    gdf_pts_mercator['geometry'] = gdf_pts_mercator.geometry.buffer(18)
 
-    grid= _create_analysis_grid(gdf_pts_mercator, cell_size=grid_cell_size)
-    grid= grid.reset_index().rename(columns={'index': 'grid_id'})
+    the_grid = _create_analysis_grid(gdf_pts_mercator, cell_size=grid_cell_size)
+    the_grid = the_grid.reset_index().rename(columns={'index': 'grid_id'})
 
-    intersection = gpd.overlay(grid, gdf_pts_mercator, how='intersection')
+    intersection = gpd.overlay(the_grid, gdf_pts_mercator, how='intersection')
     intersection['area'] = intersection.geometry.area
     intersection['weighted_cov'] = intersection['coverage_percentage'] * intersection['area']
 
@@ -49,7 +52,7 @@ def generate_heatmap(coverage_csv: str, site_prefix: str,
         area_sum=('area', 'sum')
     )
     weighted_mean = (grouped['weighted_cov_sum'] / grouped['area_sum']).rename('coverage_percentage')
-    grid_final = grid.join(weighted_mean, on='grid_id')
+    grid_final = the_grid.join(weighted_mean, on='grid_id')
 
     grid_to_plot = grid_final.dropna(subset=['coverage_percentage'])
     if grid_to_plot.empty:
@@ -59,12 +62,20 @@ def generate_heatmap(coverage_csv: str, site_prefix: str,
     fig, ax = plt.subplots(1, 1, figsize=figsize)
 
     grid_to_plot.plot(
-        column='coverage_percentage', cmap='viridis', ax=ax, legend=True,
-        edgecolor='black', linewidth=0.2,
-        legend_kwds={'label': "Area-Weighted Kelp Coverage %", "orientation": "horizontal", "pad": 0.01, "shrink": 0.4}
+        column='coverage_percentage',
+        cmap='viridis',
+        ax=ax,
+        legend=False,
+        edgecolor='black',
+        linewidth=0.2
     )
 
-    gdf_coverage_proj = gdf_pts.to_crs(grid.crs)
+    mappable = ax.collections[0]
+    cbar = fig.colorbar(mappable, ax=ax, orientation="horizontal", pad=0.01, shrink=0.9)
+    cbar.set_label("Area-Weighted Kelp Coverage %", size=colorbar_fontsize)
+    cbar.ax.tick_params(labelsize=colorbar_fontsize)
+
+    gdf_coverage_proj = gdf_pts.to_crs(the_grid.crs)
 
     if show_points:
         gdf_coverage_proj.plot(ax=ax, marker='o', color='red', markersize=20)
@@ -92,12 +103,14 @@ def generate_heatmap(coverage_csv: str, site_prefix: str,
 
     ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
     ax.set_axis_off()
-    ax.set_title(f"{site_prefix} Heatmap", fontsize=30)
+    ax.set_title(f"{site_prefix} Heatmap", fontsize=title_fontsize)
 
+    # Reverted: Always save the plot, creating a default path if none is given.
     if not output_path:
         default_dir = os.path.join("results", "heatmap")
         os.makedirs(default_dir, exist_ok=True)
         output_path = os.path.join(default_dir, f"{site_prefix}_heatmap.png")
+    
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     print(f"Heatmap saved to {output_path}")
     plt.close(fig)

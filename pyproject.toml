@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kelp_coverage"
-version = "0.1.0"
+version = "1.0"
 authors = [
 	{name="Tim Sananikone", email="tims3900@gmail.com"},
 ]
@@ -20,9 +20,7 @@ license-files = ["LICEN[CS]E*"]
 
 dependencies = [
     "pandas",
-    "geopandas",
     "matplotlib",
-    "contextily",
     "shapely",
     "numpy",
     "torch",
@@ -38,3 +36,12 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/mbari-org/KelpCoverage"
 Issues = "https://github.com/mbari-org/KelpCoverage/issues"
+
+[project.optional-dependencies]
+heatmap = [
+    "geopandas",
+    "contextily",
+]
+
+[project.scripts]
+kelp-coverage = "kelp_coverage.cli:main"

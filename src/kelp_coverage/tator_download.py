@@ -12,6 +12,7 @@ urllib3.disable_warnings()
 
 def download_images_and_get_pixels(
     file_path: str,
+    tator_token: Optional[str],
     images_dir: str = "images",
     images_per_location: int = -1,
     start_idx: Optional[int] = None,
@@ -24,13 +25,15 @@ def download_images_and_get_pixels(
     filtered_df = df.dropna(subset=['location'])
     grouped_df = filtered_df.groupby('location')
     host = "https://drone.mbari.org"
-    token = ""
     config = tator_openapi.Configuration()
     config.host = host
     config.verify_ssl = False
-    if token:
-        config.api_key['Authorization'] = token
+    if tator_token:
+        config.api_key['Authorization'] = tator_token
         config.api_key_prefix['Authorization'] = 'Token'
+    else:
+        print("Warning: No Tator token provided")
+        return None
     api = tator_openapi.TatorApi(tator_openapi.ApiClient(config))
     loc_to_pixel: Dict[str, Optional[Tuple[int, int, int]]] = {}
 
