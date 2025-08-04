@@ -3,6 +3,11 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import pprint
+import os
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+from matplotlib.patches import Patch
+import time
 
 from typing import Tuple, Dict, Any, Optional
 from .sahisam import SAHISAM
@@ -28,7 +33,9 @@ class SinglePassProcessor:
             "uniformity_check": model_args.uniformity_check,
             "uniformity_std_threshold": model_args.uniformity_std_threshold,
             "uniform_grid_thresh": model_args.uniform_grid_thresh,
-            "water_grid_thresh": model_args.water_grid_thresh
+            "water_grid_thresh": model_args.water_grid_thresh,
+            "fallback_brightness_threshold": model_args.fallback_brightness_threshold,
+            "fallback_distance_threshold": model_args.fallback_distance_threshold
         }
         if model_args.verbose:
             print("--- Initializing Single-Pass Processor with arguments: ---")
@@ -36,12 +43,12 @@ class SinglePassProcessor:
             print("---------------------------------------------------------")
         self.model = SAHISAM(**sahisam_args)
 
-    def process_image(self, image_path: str) -> Tuple[Any, Any]:
+    def process_image(self, image_path: str, full_lab_tensor_cpu: Optional[torch.Tensor] = None) -> Tuple[Any, Any]:
         if self.model.verbose:
             print("Running single-pass (detailed point search on all slices)...")
-        return self.model.process_image(image_path=image_path)
+        return self.model.process_image(image_path=image_path, full_lab_tensor_cpu=full_lab_tensor_cpu)
 
-    def reconstruct_full_mask(self, results: Any, slice_info: Dict[str, Any], image_path: str, coverage_only: bool = False) -> Any:
+    def reconstruct_full_mask(self, results: Any, slice_info: Dict[str, Any], image_lab_tensor_cpu: torch.Tensor, image_path: str, coverage_only: bool = False) -> Any:
         return self.model.reconstruct_full_mask_gpu(results, slice_info, coverage_only=coverage_only)
 
 class HierarchicalProcessor:
@@ -68,61 +75,45 @@ class HierarchicalProcessor:
             "uniformity_std_threshold": model_args.uniformity_std_threshold,
             "uniform_grid_thresh": model_args.uniform_grid_thresh,
             "water_grid_thresh": model_args.water_grid_thresh,
+            "fallback_brightness_threshold": model_args.fallback_brightness_threshold,
+            "fallback_distance_threshold": model_args.fallback_distance_threshold,
             "device": self.device,
         }
         fine_args = common_sahisam_args.copy()
         fine_args['slice_size'] = model_args.slice_size
-        self.fine_model = SAHISAM(**fine_args)
         
+        if model_args.verbose:
+            print("\n--- Initializing FINE-PASS SAHISAM with arguments: ---")
+            pprint.pprint(fine_args)
+            print("---------------------------------------------------------")
+        self.fine_model = SAHISAM(**fine_args)
+
         coarse_args = common_sahisam_args.copy()
         coarse_args['slice_size'] = model_args.hierarchical_slice_size
-        self.coarse_model = SAHISAM(**coarse_args)
         
+        if model_args.verbose:
+            print("\n--- Initializing COARSE-PASS SAHISAM with arguments: ---")
+            pprint.pprint(coarse_args)
+            print("----------------------------------------------------------")
+        self.coarse_model = SAHISAM(**coarse_args)
+
         self.use_erosion_merge = getattr(model_args, 'use_erosion_merge', False)
         self.erosion_kernel_size = getattr(model_args, 'erosion_kernel_size', 15)
-        self.use_color_validation = getattr(model_args, 'use_color_validation', False)
-        self.color_validation_threshold = getattr(model_args, 'color_validation_threshold', 50)
-        self.water_lab_tensor = torch.tensor(water_lab, device=self.device, dtype=torch.float32)
-        
+        self.use_color_validation = getattr(model_args, 'use_color_validation', True)
+        self.generate_merge_viz = getattr(model_args, 'generate_merge_viz', False)
+        self.merge_color_threshold = getattr(model_args, 'merge_color_threshold', 15)
+        self.merge_lightness_threshold = getattr(model_args, 'merge_lightness_threshold', 75.0)
+
+        self.water_lab_tensor = self.fine_model.water_lab_tensor
+
         self.internal_fine_results: Optional[Any] = None
         self.fine_slice_info: Optional[Dict[str, Any]] = None
         self.internal_coarse_results: Optional[Any] = None
         self.coarse_slice_info: Optional[Dict[str, Any]] = None
-        self.fine_mask_gpu: Optional[torch.Tensor] = None
-        self.coarse_mask_gpu: Optional[torch.Tensor] = None
+        self.fine_pass_water_mask_gpu: Optional[torch.Tensor] = None
+        self.coarse_pass_water_mask_gpu: Optional[torch.Tensor] = None
         self.pre_erosion_mask: Optional[np.ndarray] = None
         self.post_erosion_mask: Optional[np.ndarray] = None
-
-    def _image_to_lab_gpu(self, rgb_tensor: torch.Tensor) -> torch.Tensor:
-        # rgb to lab code taken from cv2 implementation
-        # https://github.com/opencv/opencv/blob/7ab4e1bf56849e9c5584ce1400adf9705710ca32/modules/ts/misc/color.py#L191
-
-        rgb_normalized = rgb_tensor.float() / 255.0
-
-        # Apply sRGB gamma de-correction to get linear RGB values
-        gamma_mask = rgb_normalized <= 0.04045
-        linear_rgb = torch.where(
-            gamma_mask,
-            rgb_normalized / 12.92,
-            torch.pow((rgb_normalized + 0.055) / 1.055, 2.4)
-        )
-
-        r, g, b = linear_rgb[..., 0], linear_rgb[..., 1], linear_rgb[..., 2]
-
-        X = (0.412453 * r + 0.357580 * g + 0.180423 * b) / 0.950456
-        Y = (0.212671 * r + 0.715160 * g + 0.072169 * b)
-        Z = (0.019334 * r + 0.119193 * g + 0.950227 * b) / 1.088754
-
-        T = 0.008856
-        fX = torch.where(X > T, torch.pow(X, 1./3.), 7.787 * X + 16./116.)
-        fY = torch.where(Y > T, torch.pow(Y, 1./3.), 7.787 * Y + 16./116.)
-        fZ = torch.where(Z > T, torch.pow(Z, 1./3.), 7.787 * Z + 16./116.)
-
-        L = torch.where(Y > T, 116. * fY - 16.0, 903.3 * Y)
-        a = 500. * (fX - fY)
-        b = 200. * (fY - fZ)
-
-        return torch.stack([L, a, b], dim=-1)
 
     def _erode_gpu(self, kelp_mask_tensor: torch.Tensor, kernel_size: int) -> torch.Tensor:
         padding = kernel_size // 2
@@ -135,76 +126,138 @@ class HierarchicalProcessor:
         ).squeeze().bool()
         return ~dilated_inverted_mask
 
-    def _merge_masks_gpu(self, coarse_water_mask: torch.Tensor, fine_water_mask: torch.Tensor, image_path: str) -> torch.Tensor:
-        coarse_kelp_mask = ~coarse_water_mask
-        fine_kelp_mask = ~fine_water_mask
+    def _merge_masks_gpu(self, fine_pass_water_mask: torch.Tensor, coarse_pass_water_mask: torch.Tensor, image_lab_tensor_cpu: torch.Tensor, image_path: str) -> torch.Tensor:
+        fine_pass_kelp_mask = ~fine_pass_water_mask
+        coarse_pass_kelp_mask = ~coarse_pass_water_mask
 
         if self.use_erosion_merge:
             kernel_size = self.erosion_kernel_size
             if kernel_size % 2 == 0: kernel_size += 1
-            eroded_coarse_kelp = self._erode_gpu(coarse_kelp_mask, kernel_size)
-            self.pre_erosion_mask = coarse_kelp_mask.cpu().numpy()
-            self.post_erosion_mask = eroded_coarse_kelp.cpu().numpy()
-        else:
-            eroded_coarse_kelp = torch.zeros_like(coarse_kelp_mask)
+            self.pre_erosion_mask = coarse_pass_kelp_mask.cpu().numpy()
+            coarse_pass_kelp_mask = self._erode_gpu(coarse_pass_kelp_mask, kernel_size)
+            self.post_erosion_mask = coarse_pass_kelp_mask.cpu().numpy()
 
-        if self.use_color_validation:
-            disagreement_zone = fine_kelp_mask & coarse_water_mask
-            if torch.any(disagreement_zone):
-                original_image_bgr = cv2.imread(image_path)
-                if original_image_bgr.shape[:2] != coarse_water_mask.shape:
-                    original_image_bgr = cv2.resize(original_image_bgr, (coarse_water_mask.shape[1], coarse_water_mask.shape[0]), interpolation=cv2.INTER_AREA)
-                
-                image_rgb_tensor = torch.from_numpy(cv2.cvtColor(original_image_bgr, cv2.COLOR_BGR2RGB)).to(self.device)
-                image_lab_tensor = self._image_to_lab_gpu(image_rgb_tensor)
+        agreed_kelp = fine_pass_kelp_mask & coarse_pass_kelp_mask
+        disagreement_zone = fine_pass_kelp_mask ^ coarse_pass_kelp_mask
 
-                disagreement_pixels_lab = image_lab_tensor[disagreement_zone]
-                distances = torch.linalg.norm(disagreement_pixels_lab - self.water_lab_tensor, dim=1)
-                is_validated_as_kelp = distances > self.color_validation_threshold
-                
-                validated_kelp_in_disagreement = torch.zeros_like(disagreement_zone)
-                validated_kelp_in_disagreement[disagreement_zone] = is_validated_as_kelp
-            else:
-                validated_kelp_in_disagreement = torch.zeros_like(disagreement_zone)
-                
-            trusted_fine_mask = (fine_kelp_mask & coarse_kelp_mask) | validated_kelp_in_disagreement
-        else:
-            trusted_fine_mask = fine_kelp_mask
+        validated_kelp_in_disagreement = torch.zeros_like(disagreement_zone)
 
-        final_kelp_mask = trusted_fine_mask | eroded_coarse_kelp
+        if self.use_color_validation and torch.any(disagreement_zone):
+            if self.fine_model.verbose: print("\n--- [Debug] Symmetrical Mask Merge Analysis ---")
+
+            torch.cuda.synchronize()
+            t_color_val_start = time.time()
+
+            disagreement_zone_cpu = disagreement_zone.cpu()
+            disagreement_pixels_lab_cpu = image_lab_tensor_cpu[disagreement_zone_cpu]
+            disagreement_pixels_lab = disagreement_pixels_lab_cpu.to(self.device)
+
+            lightness_values = disagreement_pixels_lab[:, 0]
+            is_not_too_bright = lightness_values < self.merge_lightness_threshold
+            color_values = disagreement_pixels_lab[:, 1:]
+            color_distances = torch.linalg.norm(color_values - self.water_lab_tensor[1:], dim=1)
+            is_different_color = color_distances > self.merge_color_threshold
+            is_validated_as_kelp_flat = is_not_too_bright & is_different_color
+
+            validated_kelp_in_disagreement[disagreement_zone] = is_validated_as_kelp_flat
+
+            torch.cuda.synchronize()
+            if self.fine_model.verbose:
+                print(f"    - Color validation step took: {time.time() - t_color_val_start:.2f}s")
+                print(f"    - Disagreement pixels validated as KELP: {torch.sum(validated_kelp_in_disagreement).item()}")
+
+            if self.generate_merge_viz:
+                self._save_merge_visualization(image_path, disagreement_zone_cpu, color_distances, self.merge_color_threshold)
+
+        final_kelp_mask = agreed_kelp | validated_kelp_in_disagreement
+
+        if self.fine_model.verbose:
+            print(f"  - Total KELP pixels in final merged mask: {torch.sum(final_kelp_mask).item()}")
+            print("-------------------------------------\n")
+
         return ~final_kelp_mask
 
-    def process_image(self, image_path: str) -> Tuple[Any, Dict[str, Any]]:
+    def _save_merge_visualization(self, image_path, disagreement_zone, distances_flat, threshold):
+        image_base = os.path.splitext(os.path.basename(image_path))[0]
+        site_name = os.path.basename(os.path.dirname(os.path.dirname(image_path)))
+        param_string = f"slice{self.fine_model.slice_size}_pts{self.fine_model.num_points}"
+        viz_dir = os.path.join("results", site_name, "visualizations", param_string)
+        os.makedirs(viz_dir, exist_ok=True)
+        output_path = os.path.join(viz_dir, f"{image_base}_merge_disagreement_heatmap.png")
+
+        original_image = cv2.imread(image_path)
+        if original_image.shape[:2] != disagreement_zone.shape:
+            original_image = cv2.resize(original_image, (disagreement_zone.shape[1], disagreement_zone.shape[0]), interpolation=cv2.INTER_AREA)
+
+        disagreement_zone_np = disagreement_zone.cpu().numpy()
+        distances_np = distances_flat.cpu().numpy()
+
+        heatmap = np.full(disagreement_zone_np.shape, np.nan, dtype=np.float32)
+        heatmap[disagreement_zone_np] = distances_np
+
+        plt.figure(figsize=(15, 15))
+        plt.imshow(cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB))
+
+        vmax = 25
+        cmap = plt.get_cmap('viridis_r')
+
+        plt.imshow(heatmap, cmap=cmap, alpha=0.6, vmin=0, vmax=vmax)
+
+        cbar = plt.colorbar(shrink=0.7)
+        cbar.set_label('LAB Distance to Water Color', size='large')
+        cbar.ax.axhline(threshold, color='red', linestyle='--', linewidth=2)
+        cbar.ax.text(1.5, threshold, ' Kelp Threshold', color='red', va='center', ha='left', fontsize='medium')
+
+        plt.title(f"Disagreement Zone Heatmap for {image_base}\n(Pixels above red line are validated as Kelp)", fontsize=16)
+        plt.axis('off')
+        plt.savefig(output_path, dpi=200, bbox_inches='tight')
+        plt.close()
+        if self.fine_model.verbose:
+            print(f"  - Saved merge disagreement heatmap to: {output_path}")
+
+    def process_image(self, image_path: str, full_lab_tensor_cpu: Optional[torch.Tensor] = None) -> Tuple[Any, Dict[str, Any]]:
         if self.fine_model.verbose: print("\n--- [Hierarchical] Running passes sequentially ---")
         if self.fine_model.verbose: print("   > Starting FINE pass (small slices)...")
-        self.internal_fine_results, self.fine_slice_info = self.fine_model.process_image(image_path=image_path)
+        self.internal_fine_results, self.fine_slice_info = self.fine_model.process_image(image_path=image_path, full_lab_tensor_cpu=full_lab_tensor_cpu)
         if self.coarse_model.verbose: print("   > Starting COARSE pass (large slices)...")
-        self.internal_coarse_results, self.coarse_slice_info = self.coarse_model.process_image(image_path=image_path)
+        self.internal_coarse_results, self.coarse_slice_info = self.coarse_model.process_image(image_path=image_path, full_lab_tensor_cpu=full_lab_tensor_cpu)
         if self.fine_model.verbose: print("--- [Hierarchical] Both passes complete ---")
         return self.internal_fine_results, self.fine_slice_info
 
-    def reconstruct_full_mask(self, results: Any, slice_info: Dict[str, Any], image_path: str, coverage_only: bool = False) -> Any:
+    def reconstruct_full_mask(self, results: Any, slice_info: Dict[str, Any], image_lab_tensor_cpu: torch.Tensor, image_path: str, coverage_only: bool = False) -> Any:
         if self.fine_model.verbose: print("\n--- [Hierarchical] Reconstructing and combining masks on GPU ---")
+        t_start = time.time()
         
-        self.fine_mask_gpu = self.fine_model.reconstruct_full_mask_gpu(results, slice_info, return_gpu_tensor=True)
-        self.coarse_mask_gpu = self.coarse_model.reconstruct_full_mask_gpu(self.internal_coarse_results, self.coarse_slice_info, return_gpu_tensor=True)
-        
-        if self.coarse_mask_gpu is None or self.fine_mask_gpu is None:
-             raise RuntimeError("Failed to generate one or both masks in hierarchical processing.")
+        torch.cuda.synchronize()
+        t_fine_start = time.time()
+        self.fine_pass_water_mask_gpu = self.fine_model.reconstruct_full_mask_gpu(
+            masks=results, slice_info=slice_info, return_gpu_tensor=True, merge_logic='OR')
+        torch.cuda.synchronize()
+        if self.fine_model.verbose: print(f"  > Fine pass reconstruction took: {time.time() - t_fine_start:.2f}s")
 
-        combined_mask_gpu = self._merge_masks_gpu(self.coarse_mask_gpu, self.fine_mask_gpu, image_path)
-        
-        if self.fine_model.verbose: print("--- [Hierarchical] GPU mask combination complete. ---")
+        torch.cuda.synchronize()
+        t_coarse_start = time.time()
+        self.coarse_pass_water_mask_gpu = self.coarse_model.reconstruct_full_mask_gpu(
+            masks=self.internal_coarse_results, slice_info=self.coarse_slice_info, return_gpu_tensor=True, merge_logic='AND')
+        torch.cuda.synchronize()
+        if self.fine_model.verbose: print(f"  > Coarse pass reconstruction took: {time.time() - t_coarse_start:.2f}s")
+
+        torch.cuda.synchronize()
+        t_merge_start = time.time()
+        combined_water_mask_gpu = self._merge_masks_gpu(self.fine_pass_water_mask_gpu, self.coarse_pass_water_mask_gpu, image_lab_tensor_cpu, image_path)
+        torch.cuda.synchronize()
+        if self.fine_model.verbose: print(f"  > Final mask merge took: {time.time() - t_merge_start:.2f}s")
+
+        if self.fine_model.verbose: print(f"--- [Hierarchical] GPU mask combination complete. Total time: {time.time() - t_start:.2f}s ---")
         
         if coverage_only:
-            total_pixels = combined_mask_gpu.numel()
-            if total_pixels == 0:
-                return 0.0
-            water_pixels = torch.sum(combined_mask_gpu)
+            total_pixels = combined_water_mask_gpu.numel()
+            if total_pixels == 0: return 0.0
+            water_pixels = torch.sum(combined_water_mask_gpu)
             kelp_pixels = total_pixels - water_pixels
             return ((kelp_pixels.float() / total_pixels) * 100.0).item()
         else:
-            return combined_mask_gpu.cpu().numpy()
+            return combined_water_mask_gpu.cpu().numpy()
 
     def get_fine_pass_data(self) -> Tuple[Optional[Any], Optional[Dict[str, Any]]]:
         return self.internal_fine_results, self.fine_slice_info
@@ -213,7 +266,6 @@ class HierarchicalProcessor:
         return self.internal_coarse_results, self.coarse_slice_info
 
     def get_component_masks(self) -> Dict[str, Optional[np.ndarray]]:
-        fine_mask_np = self.fine_mask_gpu.cpu().numpy() if self.fine_mask_gpu is not None else None
-        coarse_mask_np = self.coarse_mask_gpu.cpu().numpy() if self.coarse_mask_gpu is not None else None
-        return {"Fine Pass": fine_mask_np, "Coarse Pass": coarse_mask_np}
-
+        fine_water_mask_np = self.fine_pass_water_mask_gpu.cpu().numpy() if self.fine_pass_water_mask_gpu is not None else None
+        coarse_water_mask_np = self.coarse_pass_water_mask_gpu.cpu().numpy() if self.coarse_pass_water_mask_gpu is not None else None
+        return {"Fine Pass": fine_water_mask_np, "Coarse Pass": coarse_water_mask_np}

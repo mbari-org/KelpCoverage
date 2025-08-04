@@ -39,7 +39,7 @@ def _save_coverage_to_csv(image_path: str, coverage_percentage: float, results_d
         return
 
     coverage_data = {
-        'image_name': image_name, 'image_id': image_id, 'latitude': latitude, 
+        'image_name': image_name, 'image_id': image_id, 'latitude': latitude,
         'longitude': longitude, 'coverage_percentage': coverage_percentage,
         'param_string': param_string
     }
@@ -63,48 +63,52 @@ def _save_binary_mask(full_mask: np.ndarray, image_base: str, mask_dir: str) -> 
     kelp_binary_mask_img = ((~full_mask).astype(np.uint8)) * 255
     cv2.imwrite(kelp_mask_save_path, kelp_binary_mask_img)
 
-def _save_overlay(original_image: np.ndarray, masks_to_overlay: Dict[str, np.ndarray], title: str, output_path: str) -> None:
+def _save_overlay(original_image: np.ndarray, masks_to_overlay: Dict[str, np.ndarray], title: str, output_path: str, verbose: bool = False) -> None:
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     plt.figure(figsize=(12, 12))
-    plt.imshow(cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB))
-    
+    plt.imshow(original_image)
+
     num_masks = len(masks_to_overlay)
     if num_masks == 1:
-        colors = [plt.cm.get_cmap('ocean')(0.5)] 
+        colors = [plt.cm.get_cmap('ocean')(0.5)]
     else:
         cmap = plt.cm.get_cmap('viridis', num_masks)
         colors = [cmap(i) for i in range(num_masks)]
-    
+
     legend_elements = []
     for i, (name, water_mask) in enumerate(masks_to_overlay.items()):
-        if water_mask is None: continue
+        if water_mask is None:
+            continue
+
         kelp_mask = ~water_mask
+
         color = colors[i]
         overlay = np.zeros((*kelp_mask.shape, 4))
         overlay[..., :3] = color[:3]
         overlay[..., 3] = np.where(kelp_mask, 0.45, 0)
         plt.imshow(overlay)
-        legend_elements.append(Patch(facecolor=color, edgecolor=color, alpha=0.5, label=name))
-        
+
+        legend_elements.append(Patch(facecolor=color, edgecolor=color, alpha=0.5, label=f"{name} Kelp"))
+
     plt.title(title, fontsize=14)
     if legend_elements:
         plt.legend(handles=legend_elements, loc='upper right', fontsize='large')
     plt.axis('off')
     plt.savefig(output_path, dpi=200, bbox_inches='tight')
     plt.close()
-    print(f"Saved overlay to: {output_path}")
+    if verbose: print(f"Saved overlay to: {output_path}")
 
 def _save_slice_visualization(slice_info: Dict[str, Any], processed_results: List[Tuple[torch.Tensor, np.ndarray]], image_base: str, viz_dir: str, model: SAHISAM, max_size: int = 256) -> None:
     os.makedirs(viz_dir, exist_ok=True)
     img_list = slice_info['img_list']
     if not img_list: return
-    
+
     num_slices = len(img_list)
     cols = len(sorted(set(pt[0] for pt in slice_info['img_starting_pts'])))
     rows = (num_slices + cols - 1) // cols
     fig, axes = plt.subplots(rows, cols, figsize=(3 * cols, 3 * rows), squeeze=False)
     axes = axes.flatten()
-    
+
     for i in range(num_slices):
         img = img_list[i]
         mask_tensor, points = processed_results[i]
@@ -112,18 +116,18 @@ def _save_slice_visualization(slice_info: Dict[str, Any], processed_results: Lis
         scale = max_size / max(h_orig, w_orig)
         w_new, h_new = int(w_orig * scale), int(h_orig * scale)
         display_img = cv2.resize(img, (w_new, h_new), interpolation=cv2.INTER_AREA)
-        
+
         ax = axes[i]
         ax.imshow(display_img)
-        
+
         if mask_tensor.numel() > 0:
             mask_cpu = mask_tensor.cpu().numpy()
             mask_overlay_rgba = np.zeros((h_new, w_new, 4), dtype=np.uint8)
-            mask_overlay_rgba[..., 2] = 255 
-            
+            mask_overlay_rgba[..., 2] = 255
+
             padding_scaled = int(model.padding * scale)
             slice_mask_full = np.zeros(display_img.shape[:2], dtype=bool)
-            
+
             content_w, content_h = w_new - 2*padding_scaled, h_new - 2*padding_scaled
             if padding_scaled > 0 and content_w > 0 and content_h > 0:
                  content_mask = cv2.resize(mask_cpu.astype(np.uint8), (content_w, content_h), interpolation=cv2.INTER_NEAREST).astype(bool)
@@ -137,35 +141,35 @@ def _save_slice_visualization(slice_info: Dict[str, Any], processed_results: Lis
         if len(points) > 0:
             points_scaled = (np.array(points) * scale).astype(int)
             ax.plot(points_scaled[:, 0], points_scaled[:, 1], 'o', color='red', markersize=3)
-            
+
         ax.axis('off')
         ax.set_title(f"Slice {i}", fontsize=10)
-        
+
     for j in range(num_slices, len(axes)):
         axes[j].axis('off')
-        
+
     plt.tight_layout()
     slice_save_path = os.path.join(viz_dir, f"{image_base}_slices_with_points.png")
     plt.savefig(slice_save_path, dpi=150, bbox_inches='tight')
     plt.close()
 
-def _create_threshold_visualization(model: SAHISAM, image_path: str, image_base: str, viz_dir: str) -> None:
-    print("Generating threshold visualization...")
+def _create_threshold_visualization(model: SAHISAM, image_path: str, image_base: str, viz_dir: str, verbose: bool = False) -> None:
+    if verbose: print("Generating threshold visualization...")
     original_image = model._load(image_path)
     slice_info = model._slice(original_image)
     img_list = slice_info['img_list']
     if not img_list: return
-    
+
     num_slices = len(img_list)
     cols = len(sorted(set(pt[0] for pt in slice_info['img_starting_pts'])))
     rows = -(-num_slices // cols)
     fig, axes = plt.subplots(rows, cols, figsize=(5 * cols, 5 * rows), squeeze=False)
     axes = axes.flatten()
-    
-    vmax = model.threshold * 2 
+
+    vmax = model.threshold * 2
     norm = mcolors.Normalize(vmin=0, vmax=vmax)
     cmap = cm.get_cmap('viridis_r')
-    
+
     for i, img in enumerate(img_list):
         ax = axes[i]
         ax.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
@@ -175,10 +179,10 @@ def _create_threshold_visualization(model: SAHISAM, image_path: str, image_base:
             ax.imshow(masked_array, alpha=0.5, cmap=cmap, norm=norm)
         ax.set_title(f"Slice {i}", fontsize=10)
         ax.axis('off')
-        
+
     for j in range(num_slices, len(axes)):
         axes[j].axis('off')
-        
+
     sm = cm.ScalarMappable(norm=norm, cmap=cmap)
     sm.set_array([])
     fig.colorbar(sm, ax=axes.tolist(), label='Distance to Water LAB', shrink=0.8, aspect=20)
@@ -186,33 +190,33 @@ def _create_threshold_visualization(model: SAHISAM, image_path: str, image_base:
     threshold_save_path = os.path.join(viz_dir, f"{image_base}_threshold_grid.png")
     plt.savefig(threshold_save_path, dpi=200, bbox_inches='tight')
     plt.close()
-    print(f"Saved threshold grid visualization to: {threshold_save_path}")
+    if verbose: print(f"Saved threshold grid visualization to: {threshold_save_path}")
 
-def _save_erosion_visualization(original_image: np.ndarray, pre_erosion_mask: np.ndarray, post_erosion_mask: np.ndarray, title: str, output_path: str) -> None:
+def _save_erosion_visualization(original_image: np.ndarray, pre_erosion_mask: np.ndarray, post_erosion_mask: np.ndarray, title: str, output_path: str, verbose: bool = False) -> None:
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     plt.figure(figsize=(12, 12))
-    plt.imshow(cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB))
-    
+    plt.imshow(original_image)
+
     white_overlay = np.zeros((*pre_erosion_mask.shape, 4))
     white_overlay[..., :3] = [1, 1, 1]
     white_overlay[..., 3] = np.where(pre_erosion_mask, 0.5, 0)
     plt.imshow(white_overlay)
-    
+
     red_overlay = np.zeros((*post_erosion_mask.shape, 4))
     red_overlay[..., 0] = 1
     red_overlay[..., 3] = np.where(post_erosion_mask, 0.6, 0)
     plt.imshow(red_overlay)
-    
+
     legend_elements = [
-        Patch(facecolor='white', alpha=0.5, label='Coarse Mask (Before Erosion)'),
-        Patch(facecolor='red', alpha=0.6, label='Coarse Mask (After Erosion)')
+        Patch(facecolor='white', alpha=0.5, label='Coarse Kelp (Before Erosion)'),
+        Patch(facecolor='red', alpha=0.6, label='Coarse Kelp (After Erosion)')
     ]
     plt.title(title, fontsize=14)
     plt.legend(handles=legend_elements, loc='upper right', fontsize='large')
     plt.axis('off')
     plt.savefig(output_path, dpi=200, bbox_inches='tight')
     plt.close()
-    print(f"Saved erosion visualization to: {output_path}")
+    if verbose: print(f"Saved erosion visualization to: {output_path}")
 
 def run_sahi_sam_visualization(
     image_path: str,
@@ -230,9 +234,24 @@ def run_sahi_sam_visualization(
     coverage_only: bool = False
 ) -> None:
     image_base = os.path.splitext(os.path.basename(image_path))[0]
+    
+    model_for_lab = getattr(processor, 'fine_model', getattr(processor, 'model', None))
+    if not model_for_lab:
+        print("Error: Could not find a valid model in the processor to generate LAB tensor.")
+        return
+        
+    original_image = model_for_lab._load(image_path)
+    image_lab_tensor_cpu = model_for_lab._get_lab_tensor(original_image).cpu()
+
     if coverage_only:
-        results, slice_info = processor.process_image(image_path)
-        coverage_percentage = processor.reconstruct_full_mask(results, slice_info, image_path=image_path, coverage_only=True)
+        results, slice_info = processor.process_image(image_path, full_lab_tensor_cpu=image_lab_tensor_cpu)
+        coverage_percentage = processor.reconstruct_full_mask(
+            results, 
+            slice_info, 
+            image_lab_tensor_cpu=image_lab_tensor_cpu,
+            image_path=image_path, 
+            coverage_only=True
+        )
         if coverage_percentage is not None:
             if verbose: print(f"Analysis Complete. Saving coverage value...")
             _save_coverage_to_csv(image_path, coverage_percentage, results_dir, site_name, param_string, tator_csv)
@@ -249,15 +268,20 @@ def run_sahi_sam_visualization(
     os.makedirs(mask_dir, exist_ok=True)
 
     if verbose: print(f"--- Processing {image_base} ---")
-    
+
     if generate_threshold_viz:
-        model_for_viz = getattr(processor, 'fine_model', getattr(processor, 'model', None))
-        if model_for_viz:
-            _create_threshold_visualization(model_for_viz, image_path, image_base, viz_dir)
-    
-    results, slice_info = processor.process_image(image_path)
-    full_mask = processor.reconstruct_full_mask(results, slice_info, image_path=image_path, coverage_only=False)
-    
+        if model_for_lab:
+            _create_threshold_visualization(model_for_lab, image_path, image_base, viz_dir, verbose=verbose)
+
+    results, slice_info = processor.process_image(image_path, full_lab_tensor_cpu=image_lab_tensor_cpu)
+    full_mask = processor.reconstruct_full_mask(
+        results, 
+        slice_info, 
+        image_lab_tensor_cpu=image_lab_tensor_cpu,
+        image_path=image_path, 
+        coverage_only=False
+    )
+
     if full_mask is None:
         if verbose: print(f"--- Finished {image_base} (no mask generated) ---")
         return
@@ -267,10 +291,9 @@ def run_sahi_sam_visualization(
     _save_coverage_to_csv(image_path, coverage_percentage, results_dir, site_name, param_string, tator_csv)
     if verbose: print(f"Coverage for {image_base}: {coverage_percentage:.7f}%")
 
-    original_image = cv2.imread(image_path)
-    
     if (generate_erosion_viz and isinstance(processor, HierarchicalProcessor) and
-            processor.pre_erosion_mask is not None and processor.post_erosion_mask is not None):
+            hasattr(processor, 'pre_erosion_mask') and processor.pre_erosion_mask is not None and
+            hasattr(processor, 'post_erosion_mask') and processor.post_erosion_mask is not None):
         if verbose: print("Generating erosion effect visualization...")
         erosion_viz_path = os.path.join(viz_dir, f"{image_base}_erosion_effect.png")
         _save_erosion_visualization(
@@ -278,27 +301,31 @@ def run_sahi_sam_visualization(
             pre_erosion_mask=processor.pre_erosion_mask,
             post_erosion_mask=processor.post_erosion_mask,
             title=f"{image_base} | Erosion Effect (Kernel: {processor.erosion_kernel_size})",
-            output_path=erosion_viz_path
+            output_path=erosion_viz_path,
+            verbose=verbose
         )
 
     if isinstance(processor, HierarchicalProcessor):
         if verbose: print("Hierarchical mode: saving fine, coarse, and combined masks.")
         component_masks = processor.get_component_masks()
-        fine_mask, coarse_mask = component_masks.get("Fine Pass"), component_masks.get("Coarse Pass")
-        if fine_mask is not None: _save_binary_mask(fine_mask, f"{image_base}_fine_pass", mask_dir)
-        if coarse_mask is not None: _save_binary_mask(coarse_mask, f"{image_base}_coarse_pass", mask_dir)
+        fine_water_mask, coarse_water_mask = component_masks.get("Fine Pass"), component_masks.get("Coarse Pass")
+
+        if fine_water_mask is not None:
+            _save_binary_mask(fine_water_mask, f"{image_base}_fine_pass", mask_dir)
+        if coarse_water_mask is not None:
+            _save_binary_mask(coarse_water_mask, f"{image_base}_coarse_pass", mask_dir)
         _save_binary_mask(full_mask, f"{image_base}_combined", mask_dir)
-        
+
         if generate_overlay:
-            _save_overlay(original_image, {"Fine Pass Kelp": fine_mask, "Coarse Pass Kelp": coarse_mask},
-                          f"{image_base} | Fine vs. Coarse Pass", os.path.join(viz_dir, f"{image_base}_comparison_overlay.png"))
-            _save_overlay(original_image, {"Final Kelp Mask": full_mask},
-                          f"{image_base} | Final Mask | Coverage: {coverage_percentage:.2f}%", os.path.join(viz_dir, f"{image_base}_final_overlay.png"))
-    else: 
+            _save_overlay(original_image, {"Fine Pass": fine_water_mask, "Coarse Pass": coarse_water_mask},
+                          f"{image_base} | Fine vs. Coarse Pass", os.path.join(viz_dir, f"{image_base}_comparison_overlay.png"), verbose=verbose)
+            _save_overlay(original_image, {"Final": full_mask},
+                          f"{image_base} | Final Mask | Coverage: {coverage_percentage:.2f}%", os.path.join(viz_dir, f"{image_base}_final_overlay.png"), verbose=verbose)
+    else:
         _save_binary_mask(full_mask, image_base, mask_dir)
         if generate_overlay:
-            _save_overlay(original_image, {"Kelp": full_mask},
-                          f"{image_base} | Kelp Coverage: {coverage_percentage:.2f}%", os.path.join(viz_dir, f"{image_base}_overlay.png"))
+            _save_overlay(original_image, {"Final": full_mask},
+                          f"{image_base} | Kelp Coverage: {coverage_percentage:.2f}%", os.path.join(viz_dir, f"{image_base}_overlay.png"), verbose=verbose)
 
     if generate_slice_viz:
         if isinstance(processor, HierarchicalProcessor):
@@ -306,14 +333,14 @@ def run_sahi_sam_visualization(
             fine_results, fine_slice_info = processor.get_fine_pass_data()
             if fine_results and fine_slice_info:
                 _save_slice_visualization(fine_slice_info, fine_results, f"{image_base}_fine", viz_dir, processor.fine_model, max_size=slice_viz_max_size)
-            
+
             if verbose: print("Generating coarse-pass slice visualization...")
             coarse_results, coarse_slice_info = processor.get_coarse_pass_data()
             if coarse_results and coarse_slice_info:
                 _save_slice_visualization(coarse_slice_info, coarse_results, f"{image_base}_coarse", viz_dir, processor.coarse_model, max_size=slice_viz_max_size)
-        else: 
+        else:
             model_for_viz = getattr(processor, 'model', None)
             if model_for_viz:
                 _save_slice_visualization(slice_info, results, image_base, viz_dir, model_for_viz, max_size=slice_viz_max_size)
-                
+
     if verbose: print(f"--- Finished {image_base} ---")

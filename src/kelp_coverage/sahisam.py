@@ -6,6 +6,8 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
+import pprint
+
 from tqdm import tqdm
 from typing import Tuple, List, Dict, Optional, Any
 from segment_anything import sam_model_registry
@@ -34,11 +36,17 @@ class SAHISAM:
                  final_point_strategy: str = 'poisson_disk',
                  grid_size: int = 64,
                  uniformity_check: bool = True,
-                 uniformity_std_threshold: float = 10.0,
-                 uniform_grid_thresh: float = 0.90,
+                 uniformity_std_threshold: float = 5.0,
+                 uniform_grid_thresh: float = 0.98,
                  water_grid_thresh: float = 0.95,
-                 points_per_grid: int = 10
+                 points_per_grid: int = 10,
+                 fallback_brightness_threshold: float = 100.0,
+                 fallback_distance_threshold: float = 55.0
                  ) -> None:
+        
+        local_vars = locals()
+        self.config_args = {key: local_vars[key] for key in local_vars if key != 'self'}
+
         self.device = device
         self.water_lab = water_lab
         self.clahe = clahe
@@ -58,7 +66,9 @@ class SAHISAM:
         self.uniformity_std_threshold = uniformity_std_threshold
         self.uniform_grid_thresh = uniform_grid_thresh
         self.water_grid_thresh = water_grid_thresh
-        self.points_per_grid = points_per_grid 
+        self.points_per_grid = points_per_grid
+        self.fallback_brightness_threshold = fallback_brightness_threshold
+        self.fallback_distance_threshold = fallback_distance_threshold
 
         if self.use_mobile_sam:
             if self.verbose: print(f"Loading MobileSAM model from: {sam_checkpoint}")
@@ -73,13 +83,18 @@ class SAHISAM:
 
         self.model.eval()
         self.transform = ResizeLongestSide(self.model.image_encoder.img_size)
-        self.water_lab_tensor = torch.tensor(self.water_lab, device=self.device, dtype=torch.float32)
+        
+        # convert from cv2 LAB representation to 0-100, -127 - 128
+        l_opencv, a_opencv, b_opencv = self.water_lab
+        true_l = l_opencv * 100.0 / 255.0
+        true_a = float(a_opencv - 128)
+        true_b = float(b_opencv - 128)
+        self.water_lab_tensor = torch.tensor([true_l, true_a, true_b], device=self.device, dtype=torch.float32)
 
         # pixel mean / std taken directly from SAM github
         # https://github.com/facebookresearch/segment-anything/blob/dca509fe793f601edb92606367a655c15ac00fdf/segment_anything/modeling/sam.py#L27
         self.pixel_mean = torch.tensor([123.675, 116.28, 103.53], device=self.device).view(-1, 1, 1)
         self.pixel_std = torch.tensor([58.395, 57.12, 57.375], device=self.device).view(-1, 1, 1)
-
         if self.verbose:
             print(f"--- slice shortcut enabled with two conditions: ---")
             print(f"    1. Uniform Grid % >= {self.uniform_grid_thresh*100:.1f}%")
@@ -115,29 +130,63 @@ class SAHISAM:
         return {"img_list": padded_img_list, "img_starting_pts": sliced_image.starting_pixels, "original_shape": image.shape}
 
     def _get_lab_tensor(self, image: np.ndarray) -> torch.Tensor:
-        image_lab_cpu = cv2.cvtColor(image, cv2.COLOR_RGB2LAB)
-        return torch.from_numpy(image_lab_cpu).to(self.device, dtype=torch.float32)
+        # rgb to lab code taken from cv2 implementation
+        # https://github.com/opencv/opencv/blob/7ab4e1bf56849e9c5584ce1400adf9705710ca32/modules/ts/misc/color.py#L191
+        image_rgb_tensor = torch.from_numpy(image).to(self.device)
+        rgb_normalized = image_rgb_tensor.float() / 255.0
+        
+        # Apply sRGB gamma de-correction to get linear RGB values
+        gamma_mask = rgb_normalized <= 0.04045
+        linear_rgb = torch.where(
+            gamma_mask,
+            rgb_normalized / 12.92,
+            torch.pow((rgb_normalized + 0.055) / 1.055, 2.4)
+        )
+        r, g, b = linear_rgb[..., 0], linear_rgb[..., 1], linear_rgb[..., 2]
+        X = (0.412453 * r + 0.357580 * g + 0.180423 * b) / 0.950456
+        Y = (0.212671 * r + 0.715160 * g + 0.072169 * b)
+        Z = (0.019334 * r + 0.119193 * g + 0.950227 * b) / 1.088754
+        T = 0.008856
+        fX = torch.where(X > T, torch.pow(X, 1./3.), 7.787 * X + 16./116.)
+        fY = torch.where(Y > T, torch.pow(Y, 1./3.), 7.787 * Y + 16./116.)
+        fZ = torch.where(Z > T, torch.pow(Z, 1./3.), 7.787 * Z + 16./116.)
+        L = torch.where(Y > T, 116. * fY - 16.0, 903.3 * Y)
+        a = 500. * (fX - fY)
+        b = 200. * (fY - fZ)
+        return torch.stack([L, a, b], dim=-1)
 
     def _get_initial_candidates_gpu(self, lab_image_tensor: torch.Tensor, override_threshold: Optional[int] = None) -> Tuple[torch.Tensor, Dict[str, np.ndarray]]:
         current_threshold = override_threshold if override_threshold is not None else self.threshold
         h, w, _ = lab_image_tensor.shape
         grid_size = self.grid_size
-        l_channel = lab_image_tensor[:, :, 0].unsqueeze(0).unsqueeze(0)
-        pooled_l_sq = F.avg_pool2d(l_channel**2, kernel_size=grid_size, stride=grid_size)
-        pooled_l = F.avg_pool2d(l_channel, kernel_size=grid_size, stride=grid_size)
-        grid_stds = torch.sqrt(torch.clamp(pooled_l_sq.squeeze() - pooled_l.squeeze()**2, min=0))
-        uniform_grids = grid_stds <= self.uniformity_std_threshold
-        a_channel = lab_image_tensor[:, :, 1].unsqueeze(0).unsqueeze(0)
-        b_channel = lab_image_tensor[:, :, 2].unsqueeze(0).unsqueeze(0)
-        pooled_a = F.avg_pool2d(a_channel, kernel_size=grid_size, stride=grid_size)
-        pooled_b = F.avg_pool2d(b_channel, kernel_size=grid_size, stride=grid_size)
-        avg_lab_grids = torch.cat([pooled_l, pooled_a, pooled_b], dim=1).squeeze(0).permute(1, 2, 0)
-        grid_color_dist = torch.linalg.norm(avg_lab_grids - self.water_lab_tensor, dim=2)
-        water_color_grids = grid_color_dist <= current_threshold
-        valid_water_grids = water_color_grids & uniform_grids
-        pixel_validity_mask = F.interpolate(valid_water_grids.float().unsqueeze(0).unsqueeze(0), size=(h, w), mode='nearest').squeeze().bool()
+        
+        pixel_color_dist = torch.linalg.norm(lab_image_tensor - self.water_lab_tensor, dim=2)
+        water_color_pixels = pixel_color_dist <= current_threshold
+
+        grid_diagnostics = {}
+        if self.uniformity_check:
+            l_channel = lab_image_tensor[:, :, 0].unsqueeze(0).unsqueeze(0)
+            pooled_l_sq = F.avg_pool2d(l_channel**2, kernel_size=grid_size, stride=grid_size)
+            pooled_l = F.avg_pool2d(l_channel, kernel_size=grid_size, stride=grid_size)
+            grid_stds = torch.sqrt(torch.clamp(pooled_l_sq.squeeze() - pooled_l.squeeze()**2, min=0))
+            uniform_grids = grid_stds <= self.uniformity_std_threshold
+            
+            a_channel = lab_image_tensor[:, :, 1].unsqueeze(0).unsqueeze(0)
+            b_channel = lab_image_tensor[:, :, 2].unsqueeze(0).unsqueeze(0)
+            pooled_a = F.avg_pool2d(a_channel, kernel_size=grid_size, stride=grid_size)
+            pooled_b = F.avg_pool2d(b_channel, kernel_size=grid_size, stride=grid_size)
+            avg_lab_grids = torch.cat([pooled_l, pooled_a, pooled_b], dim=1).squeeze(0).permute(1, 2, 0)
+            grid_color_dist = torch.linalg.norm(avg_lab_grids - self.water_lab_tensor, dim=2)
+            water_color_grids = grid_color_dist <= current_threshold
+            
+            valid_water_grids = water_color_grids & uniform_grids
+            pixel_validity_mask = F.interpolate(valid_water_grids.float().unsqueeze(0).unsqueeze(0), size=(h, w), mode='nearest').squeeze().bool()
+            grid_diagnostics = {"uniform_grids": uniform_grids.cpu().numpy(), "water_color_grids": water_color_grids.cpu().numpy(), "valid_water_grids": valid_water_grids.cpu().numpy()}
+        else:
+            pixel_validity_mask = water_color_pixels
+            grid_diagnostics = {"uniform_grids": None, "water_color_grids": None, "valid_water_grids": None}
+
         candidates_yx = torch.nonzero(pixel_validity_mask)
-        grid_diagnostics = {"uniform_grids": uniform_grids.cpu().numpy(), "water_color_grids": water_color_grids.cpu().numpy(), "valid_water_grids": valid_water_grids.cpu().numpy()}
         return candidates_yx, grid_diagnostics
 
     def _poisson_disk_sampling(self, points: np.ndarray, n_samples: int, k: int = 30) -> List[int]:
@@ -164,9 +213,8 @@ class SAHISAM:
                 active_indices.pop(rand_idx_of_active)
         return samples_indices
 
-    def _select_prompt_points_from_grid(self, image: np.ndarray, return_diagnostics: bool = False, threshold: Optional[int] = None) -> Tuple[Optional[np.ndarray], Optional[Dict[str, Any]]]:
-        h, w, _ = image.shape
-        lab_image_tensor = self._get_lab_tensor(image)
+    def _select_prompt_points_from_grid(self, lab_image_tensor: torch.Tensor, return_diagnostics: bool = False, threshold: Optional[int] = None) -> Tuple[Optional[np.ndarray], Optional[Dict[str, Any]]]:
+        h, w, _ = lab_image_tensor.shape
         search_threshold = threshold if threshold is not None else self.threshold_max
         initial_candidates_yx, grid_diagnostics = self._get_initial_candidates_gpu(lab_image_tensor, override_threshold=search_threshold)
         diagnostics_data = None
@@ -182,17 +230,21 @@ class SAHISAM:
                     diagnostics_data = {}
                 diagnostics_data.update({"initial_candidates": np.array([]), "grid_filtered_candidates": np.array([])})
             return None, diagnostics_data
-        grid_size = self.grid_size
-        grid_indices = (initial_candidates_yx[:, 0] // grid_size) * ((w + grid_size - 1) // grid_size) + (initial_candidates_yx[:, 1] // grid_size)
-        perm = torch.randperm(initial_candidates_yx.shape[0], device=self.device)
-        shuffled_candidates = initial_candidates_yx[perm]
-        shuffled_indices = grid_indices[perm]
-        unique_grid_ids, inverse_indices = torch.unique(shuffled_indices, return_inverse=True)
-        arange_perm = torch.arange(inverse_indices.size(0), device=inverse_indices.device)
-        initial_fill_value = initial_candidates_yx.shape[0] + 1
-        first_indices = torch.full((unique_grid_ids.size(0),), fill_value=initial_fill_value, dtype=arange_perm.dtype, device=arange_perm.device)
-        first_indices.scatter_reduce_(0, inverse_indices, arange_perm, reduce='amin', include_self=True)
-        final_candidate_points_yx = shuffled_candidates[first_indices]
+        
+        final_candidate_points_yx = initial_candidates_yx
+        if self.uniformity_check:
+            grid_size = self.grid_size
+            grid_indices = (initial_candidates_yx[:, 0] // grid_size) * ((w + grid_size - 1) // grid_size) + (initial_candidates_yx[:, 1] // grid_size)
+            perm = torch.randperm(initial_candidates_yx.shape[0], device=self.device)
+            shuffled_candidates = initial_candidates_yx[perm]
+            shuffled_indices = grid_indices[perm]
+            unique_grid_ids, inverse_indices = torch.unique(shuffled_indices, return_inverse=True)
+            arange_perm = torch.arange(inverse_indices.size(0), device=inverse_indices.device)
+            initial_fill_value = initial_candidates_yx.shape[0] + 1
+            first_indices = torch.full((unique_grid_ids.size(0),), fill_value=initial_fill_value, dtype=arange_perm.dtype, device=arange_perm.device)
+            first_indices.scatter_reduce_(0, inverse_indices, arange_perm, reduce='amin', include_self=True)
+            final_candidate_points_yx = shuffled_candidates[first_indices]
+
         final_selection_yx = None
         num_candidates = final_candidate_points_yx.shape[0]
         if num_candidates == 0:
@@ -281,6 +333,8 @@ class SAHISAM:
         return generated_masks
 
     def _check_shortcut_condition(self, diagnostics: Dict[str, Any]) -> Tuple[bool, float, float]:
+        if not self.uniformity_check:
+            return False, 0.0, 0.0
         uniform_grids = diagnostics.get("uniform_grids")
         water_color_grids = diagnostics.get("water_color_grids")
         if uniform_grids is None or water_color_grids is None:
@@ -292,10 +346,11 @@ class SAHISAM:
         water_pct = np.sum(water_color_grids) / total_grids
         is_shortcut = (uniform_pct >= self.uniform_grid_thresh and water_pct >= self.water_grid_thresh)
         return is_shortcut, uniform_pct, water_pct
-    
-    def _create_debug_visualization(self, slice_img: np.ndarray, current_threshold: int, image_path: str, slice_index: int, 
-                                    output_dir: str, diagnostics: Dict[str, Any], show_heatmap: bool = False, show_stages: bool = False, is_shortcut: bool = False) -> None:
-        selected_points_xy, _ = self._select_prompt_points_from_grid(slice_img, return_diagnostics=False, threshold=current_threshold)
+
+    def _create_debug_visualization(self, slice_img: np.ndarray, current_threshold: int, image_path: str, slice_index: int,
+                                output_dir: str, diagnostics: Dict[str, Any], show_heatmap: bool = False, show_stages: bool = False, is_shortcut: bool = False) -> None:
+        lab_tensor_for_debug = self._get_lab_tensor(slice_img)
+        selected_points_xy, _ = self._select_prompt_points_from_grid(lab_tensor_for_debug, return_diagnostics=False, threshold=current_threshold)
         initial_candidates = diagnostics.get("initial_candidates", np.array([]))
         grid_filtered_candidates = diagnostics.get("grid_filtered_candidates", np.array([]))
         uniform_grids = diagnostics.get("uniform_grids")
@@ -303,7 +358,7 @@ class SAHISAM:
         valid_water_grids = diagnostics.get("valid_water_grids")
 
         plot_candidates = []
-        if len(initial_candidates) > 0 and valid_water_grids is not None:
+        if len(initial_candidates) > 0 and valid_water_grids is not None and self.uniformity_check:
             grid_indices_y, grid_indices_x = initial_candidates[:, 0] // self.grid_size, initial_candidates[:, 1] // self.grid_size
             grid_h, grid_w = valid_water_grids.shape
             plot_candidates_list = []
@@ -318,87 +373,89 @@ class SAHISAM:
                             plot_candidates_list.append(grid_candidates[sample_indices])
             if plot_candidates_list:
                 plot_candidates = np.vstack(plot_candidates_list)
-
+        elif len(initial_candidates) > 0:
+             plot_candidates = initial_candidates
+             
         image_base = os.path.splitext(os.path.basename(image_path))[0]
         base_save_path = os.path.join(output_dir, f"{image_base}_slice_{slice_index}_thresh{current_threshold}")
 
-        if uniform_grids is not None and water_color_grids is not None:
+        if show_stages:
+            if self.uniformity_check and uniform_grids is not None and water_color_grids is not None:
+                fig, ax = plt.subplots(figsize=(8, 8))
+                ax.imshow(slice_img)
+                grid_h, grid_w = uniform_grids.shape
+                for r in range(grid_h):
+                    for c in range(grid_w):
+                        is_uniform, is_water_color = uniform_grids[r, c], water_color_grids[r, c]
+                        color = 'green' if is_uniform and is_water_color else ('purple' if is_uniform else 'red')
+                        ax.add_patch(Rectangle((c*self.grid_size, r*self.grid_size), self.grid_size, self.grid_size, facecolor=color, alpha=0.3, edgecolor='white', lw=0.5))
+                legend_elements = [
+                    Patch(facecolor='green', alpha=0.3, label='Valid Grid (Uniform & Water Color)'),
+                    Patch(facecolor='purple', alpha=0.3, label='Uniform Only'),
+                    Patch(facecolor='red', alpha=0.3, label='Non-Uniform')
+                ]
+                ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), fancybox=True, shadow=True, ncol=3)
+                ax.set_title(f"Grid Validation | Slice {slice_index}" + (" (Shortcut)" if is_shortcut else ""), loc='center')
+                ax.axis('off')
+                ax.margins(0.01)
+                plt.savefig(f"{base_save_path}_stage1_grid_validation.png", bbox_inches='tight', dpi=200)
+                plt.close(fig)
+
+            if self.uniformity_check and uniform_grids is not None and water_color_grids is not None:
+                fig, ax = plt.subplots(figsize=(8, 8))
+                ax.imshow(slice_img)
+                grid_h, grid_w = uniform_grids.shape
+                for r in range(grid_h):
+                    for c in range(grid_w):
+                        is_uniform, is_water_color = uniform_grids[r, c], water_color_grids[r, c]
+                        color = 'green' if is_uniform and is_water_color else ('purple' if is_uniform else 'red')
+                        ax.add_patch(Rectangle((c*self.grid_size, r*self.grid_size), self.grid_size, self.grid_size, facecolor=color, alpha=0.3, edgecolor='white', lw=0.5))
+
+                if len(plot_candidates) > 0: ax.scatter(plot_candidates[:, 1], plot_candidates[:, 0], c='gray', s=15, alpha=0.6)
+                if len(grid_filtered_candidates) > 0: ax.scatter(grid_filtered_candidates[:, 1], grid_filtered_candidates[:, 0], c='orange', s=30, edgecolor='black', lw=0.5)
+
+                legend_elements = [
+                    Patch(facecolor='green', alpha=0.3, label='Valid Grid'),
+                    plt.Line2D([0], [0], marker='o', color='w', label=f'Unselected Points ({len(plot_candidates)} | {len(initial_candidates)})', markerfacecolor='gray', markersize=10),
+                    plt.Line2D([0], [0], marker='o', color='w', label=f'Grid Filtered ({len(grid_filtered_candidates)})', markerfacecolor='orange', markersize=10)
+                ]
+                ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), fancybox=True, shadow=True, ncol=3)
+                ax.set_title(f"Point Selection over Grid | Slice {slice_index}", loc='center')
+                ax.axis('off')
+                ax.margins(0.01)
+                plt.savefig(f"{base_save_path}_stage2_point_selection.png", bbox_inches='tight', dpi=200)
+                plt.close(fig)
+
             fig, ax = plt.subplots(figsize=(8, 8))
             ax.imshow(slice_img)
-            grid_h, grid_w = uniform_grids.shape
-            for r in range(grid_h):
-                for c in range(grid_w):
-                    is_uniform, is_water_color = uniform_grids[r, c], water_color_grids[r, c]
-                    color = 'green' if is_uniform and is_water_color else ('purple' if is_uniform else 'red')
-                    ax.add_patch(Rectangle((c*self.grid_size, r*self.grid_size), self.grid_size, self.grid_size, facecolor=color, alpha=0.3, edgecolor='white', lw=0.5))
-            legend_elements = [
-                Patch(facecolor='green', alpha=0.3, label='Valid Grid (Uniform & Water Color)'),
-                Patch(facecolor='purple', alpha=0.3, label='Uniform Only'),
-                Patch(facecolor='red', alpha=0.3, label='Non-Uniform')
-            ]
-            ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), fancybox=True, shadow=True, ncol=3)
-            ax.set_title(f"Grid Validation | Slice {slice_index}" + (" (Shortcut)" if is_shortcut else ""), loc='center')
-            ax.axis('off')
-            ax.margins(0.01)
-            plt.savefig(f"{base_save_path}_stage1_grid_validation.png", bbox_inches='tight', dpi=200)
-            plt.close(fig)
-
-        if uniform_grids is not None and water_color_grids is not None:
-            fig, ax = plt.subplots(figsize=(8, 8))
-            ax.imshow(slice_img)
-            grid_h, grid_w = uniform_grids.shape
-            for r in range(grid_h):
-                for c in range(grid_w):
-                    is_uniform, is_water_color = uniform_grids[r, c], water_color_grids[r, c]
-                    color = 'green' if is_uniform and is_water_color else ('purple' if is_uniform else 'red')
-                    ax.add_patch(Rectangle((c*self.grid_size, r*self.grid_size), self.grid_size, self.grid_size, facecolor=color, alpha=0.3, edgecolor='white', lw=0.5))
-            
-            if len(plot_candidates) > 0: ax.scatter(plot_candidates[:, 1], plot_candidates[:, 0], c='gray', s=15, alpha=0.6)
-            if len(grid_filtered_candidates) > 0: ax.scatter(grid_filtered_candidates[:, 1], grid_filtered_candidates[:, 0], c='orange', s=30, edgecolor='black', lw=0.5)
+            if len(grid_filtered_candidates) > 0: ax.scatter(grid_filtered_candidates[:, 1], grid_filtered_candidates[:, 0], c='orange', s=30, alpha=0.4)
+            if selected_points_xy is not None and len(selected_points_xy) > 0:
+                ax.scatter(selected_points_xy[:, 0], selected_points_xy[:, 1], c='red', s=60, marker='X', edgecolor='white', lw=1)
 
             legend_elements = [
-                Patch(facecolor='green', alpha=0.3, label='Valid Grid'),
-                plt.Line2D([0], [0], marker='o', color='w', label=f'Unselected Points ({len(plot_candidates)} | {len(initial_candidates)})', markerfacecolor='gray', markersize=10),
-                plt.Line2D([0], [0], marker='o', color='w', label=f'Grid Filtered ({len(grid_filtered_candidates)})', markerfacecolor='orange', markersize=10)
+                plt.Line2D([0], [0], marker='o', color='w', label=f'Grid Filtered Pool ({len(grid_filtered_candidates)})', markerfacecolor='orange', alpha=0.4, markersize=10),
+                plt.Line2D([0], [0], marker='X', color='w', label=f'Final Prompts ({len(selected_points_xy) if selected_points_xy is not None else 0})', markerfacecolor='red', markersize=12)
             ]
             ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), fancybox=True, shadow=True, ncol=3)
-            ax.set_title(f"Point Selection over Grid | Slice {slice_index}", loc='center')
+            ax.set_title(f"Final Point Selection | Slice {slice_index}", loc='center')
             ax.axis('off')
             ax.margins(0.01)
-            plt.savefig(f"{base_save_path}_stage2_point_selection.png", bbox_inches='tight', dpi=200)
+            plt.savefig(f"{base_save_path}_stage3_final_selection.png", bbox_inches='tight', dpi=200)
             plt.close(fig)
-
-        fig, ax = plt.subplots(figsize=(8, 8))
-        ax.imshow(slice_img)
-        if len(grid_filtered_candidates) > 0: ax.scatter(grid_filtered_candidates[:, 1], grid_filtered_candidates[:, 0], c='orange', s=30, alpha=0.4)
-        if selected_points_xy is not None and len(selected_points_xy) > 0:
-            ax.scatter(selected_points_xy[:, 0], selected_points_xy[:, 1], c='red', s=60, marker='X', edgecolor='white', lw=1)
-        
-        legend_elements = [
-            plt.Line2D([0], [0], marker='o', color='w', label=f'Grid Filtered Pool ({len(grid_filtered_candidates)})', markerfacecolor='orange', alpha=0.4, markersize=10),
-            plt.Line2D([0], [0], marker='X', color='w', label=f'Final Prompts ({len(selected_points_xy)})', markerfacecolor='red', markersize=12)
-        ]
-        ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.025), fancybox=True, shadow=True, ncol=3)
-        ax.set_title(f"Final Point Selection | Slice {slice_index}", loc='center')
-        ax.axis('off')
-        ax.margins(0.01)
-        plt.savefig(f"{base_save_path}_stage3_final_selection.png", bbox_inches='tight', dpi=200)
-        plt.close(fig)
 
         fig, ax = plt.subplots(figsize=(10, 10))
         ax.imshow(slice_img)
         legend_elements = []
 
         if show_heatmap:
-            lab_tensor = self._get_lab_tensor(slice_img)
-            dist_map = torch.linalg.norm(lab_tensor - self.water_lab_tensor, dim=2).cpu().numpy()
+            dist_map = torch.linalg.norm(lab_tensor_for_debug - self.water_lab_tensor, dim=2).cpu().numpy()
             vmax = current_threshold * 2
             norm = mcolors.Normalize(vmin=0, vmax=vmax)
             cmap = cm.get_cmap('viridis_r')
             ax.imshow(np.ma.masked_where(dist_map > vmax, dist_map), alpha=0.5, cmap=cmap, norm=norm)
             legend_elements.append(Patch(facecolor=cmap(0.5), alpha=0.5, label=f'Color Distance (<= {vmax})'))
-        
-        if uniform_grids is not None and water_color_grids is not None:
+
+        if self.uniformity_check and uniform_grids is not None and water_color_grids is not None:
             grid_h, grid_w = uniform_grids.shape
             for r in range(grid_h):
                 for c in range(grid_w):
@@ -410,7 +467,7 @@ class SAHISAM:
         if len(plot_candidates) > 0:
             ax.scatter(plot_candidates[:, 1], plot_candidates[:, 0], c='yellow', s=15, alpha=0.6)
             legend_elements.append(plt.Line2D([0], [0], marker='o', color='w', label=f'Sampled Initial ({len(plot_candidates)} of {len(initial_candidates)})', markerfacecolor='yellow', markersize=10))
-        
+
         if len(grid_filtered_candidates) > 0:
             ax.scatter(grid_filtered_candidates[:, 1], grid_filtered_candidates[:, 0], c='orange', s=30, edgecolor='black', lw=0.5)
             legend_elements.append(plt.Line2D([0], [0], marker='o', color='w', label=f'Grid Filtered ({len(grid_filtered_candidates)})', markerfacecolor='orange', markersize=10))
@@ -426,24 +483,26 @@ class SAHISAM:
         plt.savefig(f"{base_save_path}_stage4_final_overlay.png", bbox_inches='tight', dpi=200)
         plt.close(fig)
 
-        print(f"Saved 4 debug visualization stages to: {os.path.dirname(base_save_path)}")
+        print(f"Saved debug visualization(s) to: {os.path.dirname(base_save_path)}")
 
-    def _generate_debug_visualization(self, slice_img: np.ndarray, image_path: str, slice_index: int, diagnostics: Dict[str, Any], 
+    def _generate_debug_visualization(self, slice_img: np.ndarray, image_path: str, slice_index: int, diagnostics: Dict[str, Any],
                                       output_dir: str, show_heatmap: bool, show_stages: bool, debug_threshold: Optional[int]) -> None:
         is_shortcut, uniform_pct, water_pct = self._check_shortcut_condition(diagnostics)
         used_threshold = diagnostics.get('final_threshold_used') or debug_threshold or self.threshold
         if self.verbose:
             print(f"\n--- Debug Visualization for Slice {slice_index} ---")
-            print(f"Uniform Grid %: {uniform_pct*100:.2f}% (Threshold: >={self.uniform_grid_thresh*100:.1f}%)")
-            print(f"Water Color Grid %: {water_pct*100:.2f}% (Threshold: >={self.water_grid_thresh*100:.1f}%)")
-            if is_shortcut:
-                print("\n--- Slice met shortcut conditions. Visualization shows pre-SAM state. ---")
+            if self.uniformity_check:
+                print(f"Uniform Grid %: {uniform_pct*100:.2f}% (Threshold: >={self.uniform_grid_thresh*100:.1f}%)")
+                print(f"Water Color Grid %: {water_pct*100:.2f}% (Threshold: >={self.water_grid_thresh*100:.1f}%)")
+                if is_shortcut:
+                    print("\n--- Slice met shortcut conditions. Visualization shows pre-SAM state. ---")
         self._create_debug_visualization(
             slice_img, used_threshold, image_path, slice_index, output_dir,
             diagnostics, show_heatmap=show_heatmap, show_stages=show_stages, is_shortcut=is_shortcut)
 
     def process_image(self,
                       image_path: str,
+                      full_lab_tensor_cpu: Optional[torch.Tensor] = None,
                       visualize_slice_indices: Optional[List[int]] = None,
                       visualize_output_dir: Optional[str] = None,
                       visualize_heatmap: bool = False,
@@ -454,41 +513,65 @@ class SAHISAM:
         slice_info = self._slice(original_image)
         num_slices = len(slice_info["img_list"])
         results: List[Tuple[torch.Tensor, np.ndarray]] = [(torch.empty(0), np.array([])) for _ in range(num_slices)]
-        
+
+        if full_lab_tensor_cpu is None:
+            if self.verbose: print("NOTE: Pre-computed LAB tensor not provided. Generating one now.")
+            full_lab_tensor_cpu = self._get_lab_tensor(original_image).cpu()
+            
         slices_to_process_indices = []
         batch_points = []
         slices_for_batch = []
-        
+
         desc = f"Analyzing {os.path.basename(image_path)} slices"
         slice_iterator = tqdm(enumerate(slice_info["img_list"]), total=num_slices, desc=desc, leave=False) if self.verbose else enumerate(slice_info["img_list"])
-        
+
         for i, slice_img in slice_iterator:
             is_debug_slice = visualize_slice_indices is not None and i in visualize_slice_indices
             point_selection_threshold = debug_threshold if is_debug_slice and debug_threshold is not None else None
+
+            start_x, start_y = slice_info["img_starting_pts"][i]
+            h, w, _ = slice_img.shape
+            content_h, content_w = h - 2*self.padding, w - 2*self.padding
             
-            input_points, diagnostics = self._select_prompt_points_from_grid(slice_img, return_diagnostics=True, threshold=point_selection_threshold)
+            end_y, end_x = min(start_y + content_h, full_lab_tensor_cpu.shape[0]), min(start_x + content_w, full_lab_tensor_cpu.shape[1])
             
+            lab_slice_full_cpu = full_lab_tensor_cpu[start_y:end_y, start_x:end_x]
+            lab_image_tensor_gpu = F.pad(lab_slice_full_cpu, (0,0, self.padding, self.padding, self.padding, self.padding), "constant", 0).to(self.device)
+            input_points, diagnostics = self._select_prompt_points_from_grid(lab_image_tensor_gpu, return_diagnostics=True, threshold=point_selection_threshold)
+
             if is_debug_slice and visualize_output_dir and diagnostics:
                 self._generate_debug_visualization(
                     slice_img, image_path, i, diagnostics, visualize_output_dir,
                     visualize_heatmap, visualize_stages, debug_threshold)
                 continue
-
-            h, w, _ = slice_img.shape
-            content_h, content_w = h - 2*self.padding, w - 2*self.padding
             
             is_shortcut = False
             if diagnostics:
-                is_shortcut, uniform_pct, water_pct = self._check_shortcut_condition(diagnostics)
+                is_shortcut, _, _ = self._check_shortcut_condition(diagnostics)
                 if is_shortcut:
-                    if self.verbose: print(f"Slice {i}: Uniform: {uniform_pct*100:.1f}%, Water: {water_pct*100:.1f}%. Skipping SAM.")
+                    if self.verbose: print(f"Slice {i}: Uniform and water-colored. Skipping SAM.")
                     full_water_mask = torch.ones((content_h, content_w), dtype=torch.bool, device=self.device)
                     results[i] = (full_water_mask, np.array([]))
                     continue
 
             if input_points is None or len(input_points) == 0:
-                empty_mask = torch.zeros((content_h, content_w), dtype=torch.bool, device=self.device)
-                results[i] = (empty_mask, np.array([]))
+                avg_brightness = lab_image_tensor_gpu[:, :, 0].mean().item()
+                pixel_distances = torch.linalg.norm(lab_image_tensor_gpu - self.water_lab_tensor, dim=2)
+                avg_lab_distance = pixel_distances.mean().item()
+
+                is_water_fallback = (avg_brightness > self.fallback_brightness_threshold and
+                                  avg_lab_distance < self.fallback_distance_threshold)
+
+                if is_water_fallback:
+                    if self.verbose:
+                        print(f"Slice {i}: No points, but passed fallback check. Classifying as 'all water'.")
+                    final_mask = torch.ones((content_h, content_w), dtype=torch.bool, device=self.device)
+                else:
+                    if self.verbose:
+                        print(f"Slice {i}: No points and failed fallback check. Classifying as 'all kelp'.")
+                    final_mask = torch.zeros((content_h, content_w), dtype=torch.bool, device=self.device)
+
+                results[i] = (final_mask, np.array([]))
                 continue
 
             slices_to_process_indices.append(i)
@@ -504,7 +587,7 @@ class SAHISAM:
                 if self.padding > 0:
                     h_mask, w_mask = final_mask.shape
                     if h_mask > 2*self.padding and w_mask > 2*self.padding:
-                         mask_to_store = final_mask[self.padding:-self.padding, self.padding:-self.padding]
+                        mask_to_store = final_mask[self.padding:-self.padding, self.padding:-self.padding]
 
                 results[original_slice_index] = (mask_to_store.to(self.device), batch_points[j])
                 
@@ -514,22 +597,44 @@ class SAHISAM:
                                   masks: List[Tuple[torch.Tensor, np.ndarray]],
                                   slice_info: Dict[str, Any],
                                   coverage_only: bool = False,
-                                  return_gpu_tensor: bool = False) -> Any:
+                                  return_gpu_tensor: bool = False,
+                                  merge_logic: str = 'OR') -> Any:
         H, W = slice_info["original_shape"][:2]
-        full_mask_gpu = torch.zeros((H, W), dtype=torch.bool, device=self.device)
-        
-        for i, (mask_tensor, _) in enumerate(masks):
-            if not torch.is_tensor(mask_tensor) or mask_tensor.numel() == 0:
-                continue
-            start_x, start_y = slice_info["img_starting_pts"][i]
-            h, w = mask_tensor.shape
-            end_y, end_x = min(start_y + h, H), min(start_x + w, W)
-            if start_y >= H or start_x >= W:
-                continue
-            
-            region_h, region_w = end_y - start_y, end_x - start_x
-            full_mask_gpu[start_y:end_y, start_x:end_x] |= (mask_tensor[:region_h, :region_w] > 0.0)
-        
+
+        has_valid_masks = any(torch.is_tensor(m[0]) and m[0].numel() > 0 for m in masks)
+        if not has_valid_masks:
+            full_mask_gpu = torch.zeros((H, W), dtype=torch.bool, device=self.device)
+        elif merge_logic == 'OR':
+            full_mask_gpu = torch.zeros((H, W), dtype=torch.bool, device=self.device)
+        elif merge_logic == 'AND':
+            full_mask_gpu = torch.ones((H, W), dtype=torch.bool, device=self.device)
+            processed_pixels_mask = torch.zeros((H, W), dtype=torch.bool, device=self.device)
+        else:
+            raise ValueError("merge_logic must be either 'OR' or 'AND'")
+
+        if has_valid_masks:
+            for i, (mask_tensor, _) in enumerate(masks):
+                if not torch.is_tensor(mask_tensor) or mask_tensor.numel() == 0:
+                    continue
+
+                start_x, start_y = slice_info["img_starting_pts"][i]
+                h, w = mask_tensor.shape
+                end_y, end_x = min(start_y + h, H), min(start_x + w, W)
+                if start_y >= H or start_x >= W:
+                    continue
+
+                region_h, region_w = end_y - start_y, end_x - start_x
+                current_region_slice = (slice(start_y, end_y), slice(start_x, end_x))
+                slice_mask_data = (mask_tensor[:region_h, :region_w] > 0.0)
+
+                if merge_logic == 'OR':
+                    full_mask_gpu[current_region_slice] |= slice_mask_data
+                elif merge_logic == 'AND':
+                    overlap_region = processed_pixels_mask[current_region_slice]
+                    full_mask_gpu[current_region_slice][overlap_region] &= slice_mask_data[overlap_region]
+                    full_mask_gpu[current_region_slice][~overlap_region] = slice_mask_data[~overlap_region]
+                    processed_pixels_mask[current_region_slice] = True
+
         if coverage_only:
             total_pixels = full_mask_gpu.numel()
             if total_pixels == 0:

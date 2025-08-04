@@ -67,7 +67,7 @@ def generate_heatmap(coverage_csv: str,
         ax=ax,
         legend=False,
         edgecolor='black',
-        linewidth=0.2
+        linewidth=0
     )
 
     mappable = ax.collections[0]
