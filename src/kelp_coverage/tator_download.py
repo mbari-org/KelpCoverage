@@ -10,6 +10,7 @@ from .pixel_analysis import find_representative_lab_color, extract_location
 # hacky way to get rid of error msg for now
 urllib3.disable_warnings()
 
+
 def download_images_and_get_pixels(
     file_path: str,
     tator_token: str,
@@ -17,31 +18,30 @@ def download_images_and_get_pixels(
     images_per_location: int = -1,
     start_idx: Optional[int] = None,
     end_idx: Optional[int] = None,
-    visualize: bool = False
+    visualize: bool = False,
 ) -> Dict[str, Optional[Tuple[int, int, int]]]:
-
     df = pd.read_csv(file_path)
-    df['location'] = df['$name'].apply(extract_location)
-    filtered_df = df.dropna(subset=['location'])
-    grouped_df = filtered_df.groupby('location')
+    df["location"] = df["$name"].apply(extract_location)
+    filtered_df = df.dropna(subset=["location"])
+    grouped_df = filtered_df.groupby("location")
 
     host = "https://drone.mbari.org"
     config = tator_openapi.Configuration()
     config.host = host
     config.verify_ssl = False
     if tator_token:
-        config.api_key['Authorization'] = tator_token
-        config.api_key_prefix['Authorization'] = 'Token'
+        config.api_key["Authorization"] = tator_token
+        config.api_key_prefix["Authorization"] = "Token"
     else:
         print("Warning: No Tator token provided.")
         return None
     api = tator_openapi.TatorApi(tator_openapi.ApiClient(config))
-    
+
     loc_to_pixel: Dict[str, Optional[Tuple[int, int, int]]] = {}
 
     for location, group_df in grouped_df:
         print(f"Processing location: {location}")
-        group_df = group_df.sort_values(by='$id').reset_index(drop=True)
+        group_df = group_df.sort_values(by="$id").reset_index(drop=True)
         s_idx = start_idx if start_idx is not None else 0
         e_idx = end_idx if end_idx is not None else len(group_df)
         subset_df = group_df.iloc[s_idx:e_idx]
@@ -64,14 +64,14 @@ def download_images_and_get_pixels(
             existing_files = set()
 
         for _, row in images_to_download.iterrows():
-            media_name = row['$name']            
+            media_name = row["$name"]
             if media_name in existing_files:
                 print(f"  Skipping {media_name}, file already exists.")
                 continue
 
-            media_id_to_download = row['$id']
+            media_id_to_download = row["$id"]
             out_path = os.path.join(location_path, media_name)
-            
+
             print(f"  Downloading {media_name} (ID: {media_id_to_download})")
             try:
                 media = api.get_media(media_id_to_download)
@@ -84,7 +84,9 @@ def download_images_and_get_pixels(
                 print(f"  ERROR downloading {media_name}: {e}")
 
         print(f"Finished downloading for: {location}")
-        loc_to_pixel[location] = find_representative_lab_color(location_path, visualize=visualize)
+        loc_to_pixel[location] = find_representative_lab_color(
+            location_path, visualize=visualize
+        )
         print(f"Representative pixel value: {loc_to_pixel[location]}")
 
     print("Finished processing all locations.")
