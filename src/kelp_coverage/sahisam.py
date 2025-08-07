@@ -272,7 +272,7 @@ class SAHISAM:
                 candidate_idx = np.random.randint(0, len(points))
                 candidate_pt = points[candidate_idx]
                 all_sample_pts = points[samples_indices]
-                
+
                 diff = all_sample_pts - candidate_pt
                 dist_sq = np.sum(diff**2, axis=1)
 
@@ -282,7 +282,7 @@ class SAHISAM:
                     break
             if not found_new_point:
                 break
-                
+
         return samples_indices
 
     def _select_prompt_points_from_grid(

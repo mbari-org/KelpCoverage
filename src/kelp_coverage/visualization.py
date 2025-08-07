@@ -298,9 +298,11 @@ def run_sahi_sam_visualization(
             try:
                 existing_data = json.load(f)
                 results_list = existing_data.get("results", [])
-                all_results_dict = {res['image_name']: res for res in results_list}
+                all_results_dict = {res["image_name"]: res for res in results_list}
             except (json.JSONDecodeError, KeyError):
-                print("Warning: Could not read results.json or format is incorrect. Starting fresh.")
+                print(
+                    "Warning: Could not read results.json or format is incorrect. Starting fresh."
+                )
                 existing_data = {}
 
     image_iterator = (
@@ -372,38 +374,73 @@ def run_sahi_sam_visualization(
                             verbose=verbose,
                         )
 
-                    if generate_component_viz and isinstance(processor, HierarchicalProcessor):
+                    if generate_component_viz and isinstance(
+                        processor, HierarchicalProcessor
+                    ):
                         masks = processor.get_component_masks()
                         _save_overlay(
                             original_image,
                             masks,
                             f"{image_base} | Component Comparison",
-                                os.path.join(viz_dir, f"{image_base}_component_overlay.png"),
-                                verbose=verbose,
-                            )
+                            os.path.join(
+                                viz_dir, f"{image_base}_component_overlay.png"
+                            ),
+                            verbose=verbose,
+                        )
 
-                    if generate_erosion_viz and isinstance(processor, HierarchicalProcessor):
+                    if generate_erosion_viz and isinstance(
+                        processor, HierarchicalProcessor
+                    ):
                         _save_erosion_visualization(
                             original_image=original_image,
                             pre_erosion_mask=processor.pre_erosion_mask,
                             post_erosion_mask=processor.post_erosion_mask,
                             title=f"{image_base} | Erosion Effect (Kernel: {processor.erosion_kernel_size})",
-                            output_path=os.path.join(viz_dir, f"{image_base}_erosion_effect.png"),
+                            output_path=os.path.join(
+                                viz_dir, f"{image_base}_erosion_effect.png"
+                            ),
                             verbose=verbose,
                         )
 
                     if generate_slice_viz:
                         if isinstance(processor, HierarchicalProcessor):
-                            fine_results, fine_slice_info = processor.get_fine_pass_data()
+                            fine_results, fine_slice_info = (
+                                processor.get_fine_pass_data()
+                            )
                             if fine_results and fine_slice_info:
-                                _save_slice_visualization(fine_slice_info, fine_results, f"{image_base}_fine", viz_dir, processor.fine_model, max_size=slice_viz_max_size)
-                            coarse_results, coarse_slice_info = processor.get_coarse_pass_data()
+                                _save_slice_visualization(
+                                    fine_slice_info,
+                                    fine_results,
+                                    f"{image_base}_fine",
+                                    viz_dir,
+                                    processor.fine_model,
+                                    max_size=slice_viz_max_size,
+                                )
+                            coarse_results, coarse_slice_info = (
+                                processor.get_coarse_pass_data()
+                            )
                             if coarse_results and coarse_slice_info:
-                                _save_slice_visualization(coarse_slice_info, coarse_results, f"{image_base}_coarse", viz_dir, processor.coarse_model, max_size=slice_viz_max_size)
+                                _save_slice_visualization(
+                                    coarse_slice_info,
+                                    coarse_results,
+                                    f"{image_base}_coarse",
+                                    viz_dir,
+                                    processor.coarse_model,
+                                    max_size=slice_viz_max_size,
+                                )
                         else:
-                            _save_slice_visualization(slice_info, results, image_base, viz_dir, model, max_size=slice_viz_max_size)
+                            _save_slice_visualization(
+                                slice_info,
+                                results,
+                                image_base,
+                                viz_dir,
+                                model,
+                                max_size=slice_viz_max_size,
+                            )
 
-                _, image_id, latitude, longitude = _get_image_metadata(image_path, tator_csv)
+                _, image_id, latitude, longitude = _get_image_metadata(
+                    image_path, tator_csv
+                )
 
                 result_data = {
                     "image_name": image_name,
@@ -416,7 +453,9 @@ def run_sahi_sam_visualization(
                 images_processed_since_save += 1
                 if images_processed_since_save >= 25:
                     if verbose:
-                        print(f"\n--- Saving progress ({images_processed_since_save} images processed)... ---")
+                        print(
+                            f"\n--- Saving progress ({images_processed_since_save} images processed)... ---"
+                        )
                     final_output = {
                         "command": existing_data.get("command", command_str),
                         "run_args": existing_data.get("run_args", run_args_dict),
@@ -424,7 +463,7 @@ def run_sahi_sam_visualization(
                     }
                     with open(output_json_path, "w") as f:
                         json.dump(final_output, f, indent=4)
-                    images_processed_since_save = 0 
+                    images_processed_since_save = 0
 
             except Exception as e:
                 print(f"\n--- ERROR processing {os.path.basename(image_path)}: {e} ---")
@@ -434,7 +473,9 @@ def run_sahi_sam_visualization(
     finally:
         if images_processed_since_save > 0:
             if verbose:
-                print(f"\n--- Final save before exiting ({images_processed_since_save} new images)... ---")
+                print(
+                    f"\n--- Final save before exiting ({images_processed_since_save} new images)... ---"
+                )
             final_output = {
                 "command": existing_data.get("command", command_str),
                 "run_args": existing_data.get("run_args", run_args_dict),
