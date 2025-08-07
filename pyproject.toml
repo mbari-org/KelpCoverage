@@ -41,3 +41,6 @@ Issues = "https://github.com/mbari-org/KelpCoverage/issues"
 
 [project.scripts]
 kelp-coverage = "kelp_coverage.cli:main"
+
+[tool.setuptools.packages.find]
+exclude = ["docs*"]

@@ -6,6 +6,9 @@
 
 `kelp-coverage` is a command-line package designed to analyze UAV imagery of the ocean to calculate the percentage of kelp coverage. It utilizes the Segment Anything Model (SAM) in combination with Sliced Aided Hyper-Inference (SAHI) to create high-resolution segmentations of kelp from water.
 
+![UAV Example](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/docs/img/UAV_example.JPG)
+*Example of one UAV image.*
+
 ## Table of Contents
 1.  [How It Works](#how-it-works)
 2.  [Installation](#installation)
@@ -26,12 +29,12 @@ pip install kelp-coverage
 
 The core idea behind how the program works is by leveraging the segment anything model to mask out the background (water) within the image. Since most of the images will contain either kelp or water, by inversing the problem and instead creating a segmentation for where the water is within the image we can get a good estimate of the kelp coverage.
 
-
 ### 1. Median water pixel
 The pipeline begins by sampling 50,000 pixels from each image within a site. It then calculates the median pixel value in CIELAB color space. This creates a unique "water pixel" value for each individual site which is crucial since water color can be incredibly varied.
 
-![UAV Example](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/img/UAV_example.JPG)
-*Example of one UAV image.*
+<img src="https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/docs/img/trinity-2_20250618T165438_Seymour_DSC02520.JPG" width="45%"></img> <img src="https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/docs/img/trinity-2_20250404T173830_Seymour_DSC02013.JPG" width="45%"></img> 
+
+*Example of how UAV images from the same site but at different times can be different. UAV image on the right was taken on 2025/06/18 and image on the left was taken on 2025/04/04 at the Seymour survey site*
 
 ### 2. Slicing and Segmentation
 Slicing the image serves two purposes. 
@@ -42,17 +45,21 @@ The tool first slices the image into smaller overlapping tiles. For each slice, 
 
 *utilizing a hierarchical two-pass approach is optional but recommended for more accurate results*
 
-![Debug Example](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/img/debug_example.png)
+<img src="https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/docs/img/debug_example.png" width="45%"></img>
+
 *Debug image showcasing the point selection.*
 
 ### 3. Merging and Reconstruction
 After all slices are processed they are merged and inverted to create a full resolution kelp segmentation mask.
 
-![Final Mask](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/img/final_mask_example.png)
-*The final kelp mask...*
+![Final Mask](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/docs/img/fine_coarse_example.png)
+*The two masks generated from the fine and coarse model...*
 
-![Overlay Example](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/img/overlay_example.png)
-*...and overlay visualizations are saved in the run-specific output folder.*
+![Final Mask](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/docs/img/final_mask_example.png)
+*..The final joined kelp mask...*
+
+![Overlay Example](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/docs/img/overlay_example.png)
+*...and overlay visualizations which are saved in the run-specific output folder.*
 
 
 ## Output Files and Directory Structure
@@ -110,7 +117,7 @@ This is the main output file, containing the command used, all run parameters, a
 ### Geospatial Heatmap
 You can also generate a georeferenced heatmap to get a spatial overview of kelp density across a site.
 
-![Heatmap Example](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/img/heatmap_example.png)
+![Heatmap Example](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/docs/img/heatmap_example.png)
 *Heatmaps are saved in the `results/heatmap/` directory.*
 
 
