@@ -278,6 +278,7 @@ def run_sahi_sam_visualization(
     generate_erosion_viz: bool = False,
     slice_viz_max_size: int = 256,
     coverage_only: bool = False,
+    overwrite: bool = False,
 ) -> None:
     viz_dir = os.path.join(run_dir, "visualizations")
     mask_dir = os.path.join(run_dir, "masks")
@@ -285,18 +286,21 @@ def run_sahi_sam_visualization(
     os.makedirs(mask_dir, exist_ok=True)
 
     output_json_path = os.path.join(run_dir, "results.json")
-    all_results = []
-    processed_images = set()
+
+    all_results_dict = {}
+    existing_data = {}
 
     if os.path.exists(output_json_path):
-        print(f"Found existing results file. Resuming run in {run_dir}")
+        if verbose:
+            print(f"Found existing results file. Loading data from {run_dir}")
         with open(output_json_path, "r") as f:
             try:
                 existing_data = json.load(f)
-                all_results = existing_data.get("results", [])
-                processed_images = {res.get("image_name") for res in all_results}
-            except json.JSONDecodeError:
-                print("Warning: Could not read existing results.json. Starting fresh.")
+                results_list = existing_data.get("results", [])
+                all_results_dict = {res['image_name']: res for res in results_list}
+            except (json.JSONDecodeError, KeyError):
+                print("Warning: Could not read results.json or format is incorrect. Starting fresh.")
+                existing_data = {}
 
     image_iterator = (
         tqdm(image_paths, desc=f"Processing Images for {site_name}")
@@ -304,144 +308,132 @@ def run_sahi_sam_visualization(
         else image_paths
     )
 
-    for image_path in image_iterator:
-        image_name = os.path.basename(image_path)
-        if image_name in processed_images:
-            if verbose:
-                print(f"Skipping already processed image: {image_name}")
-            continue
+    images_processed_since_save = 0
 
-        try:
-            image_base = os.path.splitext(image_name)[0]
-            if verbose:
-                print(f"--- Processing {image_base} ---")
+    try:
+        for image_path in image_iterator:
+            image_name = os.path.basename(image_path)
 
-            if hasattr(processor, "model"):
-                model = processor.model
-            elif hasattr(processor, "fine_model"):
-                model = processor.coarse_model
-            original_image = model._load(image_path)
-            image_lab_tensor_cpu = model._get_lab_tensor(original_image).cpu()
+            if not overwrite and image_name in all_results_dict:
+                if verbose:
+                    print(f"Skipping already processed image: {image_name}")
+                continue
 
-            results, slice_info = processor.process_image(
-                image_path, full_lab_tensor_cpu=image_lab_tensor_cpu
-            )
+            try:
+                image_base = os.path.splitext(image_name)[0]
+                if verbose:
+                    print(f"--- Processing {image_base} ---")
 
-            if coverage_only:
-                coverage_percentage = processor.reconstruct_full_mask(
-                    results,
-                    slice_info,
-                    image_lab_tensor_cpu=image_lab_tensor_cpu,
-                    image_path=image_path,
-                    run_dir=run_dir,
-                    coverage_only=True,
-                )
-            else:
-                full_mask = processor.reconstruct_full_mask(
-                    results,
-                    slice_info,
-                    image_lab_tensor_cpu=image_lab_tensor_cpu,
-                    image_path=image_path,
-                    run_dir=run_dir,
-                    coverage_only=False,
+                if hasattr(processor, "model"):
+                    model = processor.model
+                elif hasattr(processor, "fine_model"):
+                    model = processor.coarse_model
+                original_image = model._load(image_path)
+                image_lab_tensor_cpu = model._get_lab_tensor(original_image).cpu()
+
+                results, slice_info = processor.process_image(
+                    image_path, full_lab_tensor_cpu=image_lab_tensor_cpu
                 )
 
-                if full_mask is None:
-                    if verbose:
-                        print(f"--- Finished {image_base} (no mask generated) ---")
-                    continue
-
-                coverage_percentage = _calculate_coverage(full_mask)
-
-                _save_binary_mask(full_mask, image_base, mask_dir)
-
-                if generate_overlay:
-                    _save_overlay(
-                        original_image,
-                        {"Final": full_mask},
-                        f"{image_base} | Kelp Coverage: {coverage_percentage:.2f}%",
-                        os.path.join(viz_dir, f"{image_base}_overlay.png"),
-                        verbose=verbose,
+                if coverage_only:
+                    coverage_percentage = processor.reconstruct_full_mask(
+                        results,
+                        slice_info,
+                        image_lab_tensor_cpu=image_lab_tensor_cpu,
+                        image_path=image_path,
+                        run_dir=run_dir,
+                        coverage_only=True,
+                    )
+                else:
+                    full_mask = processor.reconstruct_full_mask(
+                        results,
+                        slice_info,
+                        image_lab_tensor_cpu=image_lab_tensor_cpu,
+                        image_path=image_path,
+                        run_dir=run_dir,
+                        coverage_only=False,
                     )
 
-                if generate_erosion_viz and isinstance(
-                    processor, HierarchicalProcessor
-                ):
-                    if (
-                        hasattr(processor, "pre_erosion_mask")
-                        and processor.pre_erosion_mask is not None
-                    ):
-                        _save_erosion_visualization(
-                            original_image=original_image,
-                            pre_erosion_mask=processor.pre_erosion_mask,
-                            post_erosion_mask=processor.post_erosion_mask,
-                            title=f"{image_base} | Erosion Effect (Kernel: {processor.erosion_kernel_size})",
-                            output_path=os.path.join(
-                                viz_dir, f"{image_base}_erosion_effect.png"
-                            ),
+                    if full_mask is None:
+                        if verbose:
+                            print(f"--- Finished {image_base} (no mask generated) ---")
+                        continue
+
+                    coverage_percentage = _calculate_coverage(full_mask)
+                    _save_binary_mask(full_mask, image_base, mask_dir)
+
+                    if generate_overlay:
+                        _save_overlay(
+                            original_image,
+                            {"Final": full_mask},
+                            f"{image_base} | Kelp Coverage: {coverage_percentage:.2f}%",
+                            os.path.join(viz_dir, f"{image_base}_overlay.png"),
                             verbose=verbose,
                         )
 
-                if generate_slice_viz:
-                    if isinstance(processor, HierarchicalProcessor):
-                        fine_results, fine_slice_info = processor.get_fine_pass_data()
-                        if fine_results and fine_slice_info:
-                            _save_slice_visualization(
-                                fine_slice_info,
-                                fine_results,
-                                f"{image_base}_fine",
-                                viz_dir,
-                                processor.fine_model,
-                                max_size=slice_viz_max_size,
+                    if generate_erosion_viz and isinstance(processor, HierarchicalProcessor):
+                        if hasattr(processor, "pre_erosion_mask") and processor.pre_erosion_mask is not None:
+                            _save_erosion_visualization(
+                                original_image=original_image,
+                                pre_erosion_mask=processor.pre_erosion_mask,
+                                post_erosion_mask=processor.post_erosion_mask,
+                                title=f"{image_base} | Erosion Effect (Kernel: {processor.erosion_kernel_size})",
+                                output_path=os.path.join(viz_dir, f"{image_base}_erosion_effect.png"),
+                                verbose=verbose,
                             )
-                        coarse_results, coarse_slice_info = (
-                            processor.get_coarse_pass_data()
-                        )
-                        if coarse_results and coarse_slice_info:
-                            _save_slice_visualization(
-                                coarse_slice_info,
-                                coarse_results,
-                                f"{image_base}_coarse",
-                                viz_dir,
-                                processor.coarse_model,
-                                max_size=slice_viz_max_size,
-                            )
-                    else:
-                        _save_slice_visualization(
-                            slice_info,
-                            results,
-                            image_base,
-                            viz_dir,
-                            model,
-                            max_size=slice_viz_max_size,
-                        )
 
-            _, image_id, latitude, longitude = _get_image_metadata(
-                image_path, tator_csv
-            )
+                    if generate_slice_viz:
+                        if isinstance(processor, HierarchicalProcessor):
+                            fine_results, fine_slice_info = processor.get_fine_pass_data()
+                            if fine_results and fine_slice_info:
+                                _save_slice_visualization(fine_slice_info, fine_results, f"{image_base}_fine", viz_dir, processor.fine_model, max_size=slice_viz_max_size)
+                            coarse_results, coarse_slice_info = processor.get_coarse_pass_data()
+                            if coarse_results and coarse_slice_info:
+                                _save_slice_visualization(coarse_slice_info, coarse_results, f"{image_base}_coarse", viz_dir, processor.coarse_model, max_size=slice_viz_max_size)
+                        else:
+                            _save_slice_visualization(slice_info, results, image_base, viz_dir, model, max_size=slice_viz_max_size)
 
-            result_data = {
-                "image_name": image_name,
-                "image_id": int(image_id) if image_id is not None else None,
-                "latitude": float(latitude) if latitude is not None else None,
-                "longitude": float(longitude) if longitude is not None else None,
-                "coverage_percentage": coverage_percentage,
-            }
-            all_results.append(result_data)
-            sorted_run_args = dict(sorted(run_args_dict.items()))
+                _, image_id, latitude, longitude = _get_image_metadata(image_path, tator_csv)
+
+                result_data = {
+                    "image_name": image_name,
+                    "image_id": int(image_id) if image_id is not None else None,
+                    "latitude": float(latitude) if latitude is not None else None,
+                    "longitude": float(longitude) if longitude is not None else None,
+                    "coverage_percentage": coverage_percentage,
+                }
+                all_results_dict[image_name] = result_data
+                images_processed_since_save += 1
+                if images_processed_since_save >= 25:
+                    if verbose:
+                        print(f"\n--- Saving progress ({images_processed_since_save} images processed)... ---")
+                    final_output = {
+                        "command": existing_data.get("command", command_str),
+                        "run_args": existing_data.get("run_args", run_args_dict),
+                        "results": list(all_results_dict.values()),
+                    }
+                    with open(output_json_path, "w") as f:
+                        json.dump(final_output, f, indent=4)
+                    images_processed_since_save = 0 
+
+            except Exception as e:
+                print(f"\n--- ERROR processing {os.path.basename(image_path)}: {e} ---")
+                with open(os.path.join(run_dir, "error_log.txt"), "a") as f:
+                    f.write(f"Error on {image_path}: {e}\n")
+                continue
+    finally:
+        if images_processed_since_save > 0:
+            if verbose:
+                print(f"\n--- Final save before exiting ({images_processed_since_save} new images)... ---")
             final_output = {
-                "command": command_str,
-                "run_args": sorted_run_args,
-                "results": all_results,
+                "command": existing_data.get("command", command_str),
+                "run_args": existing_data.get("run_args", run_args_dict),
+                "results": list(all_results_dict.values()),
             }
             with open(output_json_path, "w") as f:
                 json.dump(final_output, f, indent=4)
-
-        except Exception as e:
-            print(f"\n--- ERROR processing {os.path.basename(image_path)}: {e} ---")
-            with open(os.path.join(run_dir, "error_log.txt"), "a") as f:
-                f.write(f"Error on {image_path}: {e}\n")
-            continue
+            if verbose:
+                print("Final results saved.")
 
     if verbose:
         print(f"--- Analysis complete. All results saved in: {run_dir} ---")

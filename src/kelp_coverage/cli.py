@@ -180,6 +180,7 @@ def _process_site(
         generate_erosion_viz=getattr(args, "generate_erosion_viz", False),
         slice_viz_max_size=args.slice_viz_max_size,
         coverage_only=args.coverage_only,
+        overwrite=args.overwrite,
     )
 
 
@@ -210,10 +211,6 @@ def _run_analysis(args: argparse.Namespace) -> None:
 
         run_dir = os.path.join(results_dir, site, run_hash)
         os.makedirs(run_dir, exist_ok=True)
-
-        if args.overwrite and os.path.exists(os.path.join(run_dir, "results.json")):
-            print(f"Overwriting run in {run_dir}. Deleting existing results.json.")
-            os.remove(os.path.join(run_dir, "results.json"))
 
         _process_site(site, args, loc_to_pixel, run_dir, command_str, run_args_dict)
 
