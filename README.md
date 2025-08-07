@@ -7,55 +7,148 @@
 `kelp-coverage` is a command-line package designed to analyze UAV imagery of the ocean to calculate the percentage of kelp coverage. It utilizes the Segment Anything Model (SAM) in combination with Sliced Aided Hyper-Inference (SAHI) to create high-resolution segmentations of kelp from water.
 
 ## Table of Contents
-1.  [Installation](#installation)
-2.  [Core Concepts](#core-concepts)
-3.  [Workflow Overview](#workflow-overview)
-4.  [Command Reference](#command-reference)
-5.  [Full Argument Reference](#full-argument-reference)
-6.  [Examples](#examples)
+1.  [How It Works](#how-it-works)
+2.  [Installation](#installation)
+3.  [Output Files and Directory Structure](#output-files-and-directory-structure)
+4.  [Examples](#examples)
+5.  [Command Reference](#command-reference)
 
 ## Installation
 
-1.  **Install from PyPI:**
-    Install the package directly from PyPI using [pip](https://test.pypi.org/project/kelp-coverage/).
+**Install from PyPI:**
+Install the package directly from PyPI using [pip](https://pypi.org/project/kelp-coverage/). The MobileSAM model will be downloaded by default on the first run of the program.
 
+```bash
+pip install kelp-coverage
+```
+
+## How It Works
+
+The core idea behind how the program works is by leveraging the segment anything model to mask out the background (water) within the image. Since most of the images will contain either kelp or water, by inversing the problem and instead creating a segmentation for where the water is within the image we can get a good estimate of the kelp coverage.
+
+
+### 1. Median water pixel
+The pipeline begins by sampling 50,000 pixels from each image within a site. It then calculates the median pixel value in CIELAB color space. This creates a unique "water pixel" value for each individual site which is crucial since water color can be incredibly varied.
+
+![UAV Example](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/img/UAV_example.JPG)
+*Example of one UAV image.*
+
+### 2. Slicing and Segmentation
+Slicing the image serves two purposes. 
+1. since the model was trained on 1024x1024 images, reducing the image to the native size of the Segment Anything Model (SAM) helps it better detect objects
+2. by slicing the image, the amount of space the kelp takes increases, thus making it easier for the model to detect it as an object and not a part of the background
+
+The tool first slices the image into smaller overlapping tiles. For each slice, the pipeline uses the calibrated water color to find pixels that are a close match. These water-colored pixels are used as **seed points** for the SAM model and are used to generate slice segmentations. This process also utilizes a hierarchical two-pass system (coarse and fine) to ensure both large bodies of water and small gaps are accurately captured. 
+
+*utilizing a hierarchical two-pass approach is optional but recommended for more accurate results*
+
+![Debug Example](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/img/debug_example.png)
+*Debug image showcasing the point selection.*
+
+### 3. Merging and Reconstruction
+After all slices are processed they are merged and inverted to create a full resolution kelp segmentation mask.
+
+![Final Mask](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/img/final_mask_example.png)
+*The final kelp mask...*
+
+![Overlay Example](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/img/overlay_example.png)
+*...and overlay visualizations are saved in the run-specific output folder.*
+
+
+## Output Files and Directory Structure
+
+The tool organizes all outputs into a `results/` directory. Each analysis run is stored in a subdirectory named with a unique hash of the run parameters, ensuring that results from different settings don't overwrite each other.
+
+```text
+results/
+├── debug/
+│   └── trinity-2..._slice_0_thresh20_stage1_grid_validation.png
+│   └── trinity-2..._slice_0_thresh20_stage2_point_selection.png
+│   └── ... (more debug images)
+├── heatmap/
+│   └── 20241220T190455_heatmap.png
+├── trinity-2_20241220T190455/
+│   └── 89bb41f9/
+│       ├── results.json
+│       ├── masks/
+│       │   └── trinity-2..._kelp_mask.png
+│       └── visualizations/
+│           └── trinity-2..._overlay.png
+│           └── ... (more viz images)
+└── pixel_values.csv
+```
+
+### `results.json`
+This is the main output file, containing the command used, all run parameters, and a list of results for each processed image, including its name, ID, geolocation, and the final calculated kelp coverage percentage.
+
+```json
+{
+    "command": "kelp-coverage analyze --site trinity-2_20241220T190455...",
+    "run_args": {
+        "command": "analyze",
+        "hierarchical": true,
+        "slice_size": 1024,
+        "hierarchical_slice_size": 4096,
+        "threshold": 20,
+        "use_erosion_merge": true,
+        "use_color_validation": true,
+        "...": "..."
+    },
+    "results": [
+        {
+            "image_name": "trinity-2_20241220T190455_NewBrighton_DSC01634.JPG",
+            "image_id": 162986,
+            "latitude": 36.97335830004439,
+            "longitude": -121.94042791898332,
+            "coverage_percentage": 0.0
+        },
+        "..."
+    ]
+}
+```
+
+### Geospatial Heatmap
+You can also generate a georeferenced heatmap to get a spatial overview of kelp density across a site.
+
+![Heatmap Example](https://raw.githubusercontent.com/mbari-org/KelpCoverage/main/img/heatmap_example.png)
+*Heatmaps are saved in the `results/heatmap/` directory.*
+
+
+## Examples
+
+**Standard Workflow:**
+
+1.  **Setup:** Download 5 images per site from a csv containing Tator metadata.
     ```bash
-    pip install -i [https://test.pypi.org/simple/](https://test.pypi.org/simple/) kelp-coverage
+    kelp-coverage setup \
+    --tator-csv all_sites_metadata.csv \
+    --tator-token <your_api_token> \
+    --images 5
     ```
-2.  **Download a SAM Checkpoint:**
-    The tool defaults to using MobileSAM. Download the checkpoint file into your working directory:
 
+2.  **Analysis:** Run analysis on a single site.
     ```bash
-    wget -q [https://github.com/ChaoningZhang/MobileSAM/raw/master/weights/mobile_sam.pt](https://github.com/ChaoningZhang/MobileSAM/raw/master/weights/mobile_sam.pt)
+    kelp-coverage analyze \
+      --site "trinity-2_20241220T190455" \
+      --tator-csv all_sites_metadata.csv \
+      --hierarchical \
+      --generate-overlay
     ```
-    If you wish to use the original, larger SAM models, download one of the official checkpoints from the [SAM repository](https://github.com/facebookresearch/segment-anything#model-checkpoints).
 
-## Core Concepts
+4.  **Debug a problematic image:**
+    ```bash
+    kelp-coverage debug-slice \
+      --site "trinity-2_20241220T190455" \
+      --image-path "/content/images/trinity-2_20241220T190455/trinity-2_20241220T190455_NewBrighton_DSC01645.JPG" \
+      --slice-index 42 \
+      --visualize-stages \
+      --heatmap
+    ```
 
-* **Site:** A `site` refers to a specifc drone survey represented by a unique name (`trinity-2_20250123T185918`). The tool organizes results and images based on these site names
-
-* **Representative Water Pixel Value:** To generate accurate coverage calculations the program first needs to have access to the "average" water pixel within a site. The `setup` command samples a 50000 pixels from each image and then takes the median of all the pixels. It then saves this pixel value (in LAB color space) and uses it as a baseline for generating seed points for segmentation.
-
-* **Hierarchical Processing (`--hierarchical`):** For more accurate results using a hierarchical appraoch is recommended.
-    1.  **Coarse Pass:** The tool first analyzes the image using large slices (e.g., 4096x4096) to generate a high-level, coarse mask.
-    2.  **Fine Pass:** Next, the tool uses smaller, more detailed slices (e.g., 1024x1024) to create a fine-grained mask that better captures edges.
-    3.  **Intelligent Merge:** The two masks are combined using a sophisticated merge logic. By default, this involves:
-        * **Erosion (`--use-erosion-merge`):** The coarse mask is slightly eroded to remove small, noisy detections and provide a more reliable baseline.
-        * **Color Validation (`--use-color-validation`):** Across the areas of disagreement, the tool analyzes pixel values in order to correct any misidentifications of kelp
-
-## Workflow Overview
-
-The typical workflow involves four main steps:
-
-1.  **`setup`:** Download the image metadata CSV from the **[drone website URL]** and use it to download images from Tator. This step also calculates the representative water color for each site. This only needs to be done once per dataset.
-
-2.  **`analyze`:** Run the main segmentation analysis on the downloaded images. This is where kelp coverage is calculated. You can run this multiple times with different parameters.
-
-3.  **`debug-slice`:** (Optional) If you notice strange results for a particular image, use this command to inspect the segmentation process on specific slices of that image.
-
-4.  **`heatmap`:** Once you have coverage data for a site, generate a spatial heatmap to visualize the distribution of kelp.
-
----
+5.  **Create a heatmap from results:**
+    ```bash    
+    kelp-coverage heatmap --coverage-data "/content/results/trinity-2_20241220T190455/4005f6fd/results.json" --show-points
+    
 
 ## Command Reference
 
@@ -64,139 +157,66 @@ Downloads images via Tator and computes representative water pixel values for ea
 ```bash
 kelp-coverage setup --tator-csv <path_to_metadata.csv> --tator-token <your_api_token> [options]
 ```
+**Arguments:**
+* `--tator-csv <path>`: **(Required)** Path to the image CSV file.
+* `--tator-token <token>`: **(Required)** API token for Tator.
+* `--images <int>`: Number of images to download per site. -1 for all images (default).
+* `--start-idx <int>` / `--end-idx <int>`: Optional start/end index from the CSV to process.
+* `--visualize`: Display histograms of the LAB color channels for each site.
+
+---
 
 ### `analyze`
-Runs the kelp segmentation analysis. Can be run on a single site or all sites found in `images/`.
+Run the kelp segmentation analysis.
 ```bash
-# Analyze a single site
 kelp-coverage analyze --site <site_name> --tator-csv <path_to_metadata.csv> [options]
-
-# Analyze all sites
-kelp-coverage analyze --tator-csv <path_to_metadata.csv> [options]
 ```
+**Key Arguments:**
+* `--site <name>`: Specify a single site to process. Processes all sites if omitted.
+* `--tator-csv <path>`: **(Required)** Path to the CSV to link results with metadata.
+* `--images <filenames>`: A comma-separated list of specific image filenames to process.
+* `--count <int>`: Number of images to randomly select and process from each site. -1 for all (default).
+* `--coverage-only`: Only compute and save coverage values (fastest).
+* `--overwrite`: Overwrite existing results for a site.
+* `--verbose, -v`: Verbose output.
 
-#### The `analyze` Process: A Technical Look
-The `analyze` command executes a sophisticated pipeline for each image:
+**Hierarchical Method:**
+* `--hierarchical / --no-hierarchical`: Use a two-pass hierarchical method (default: enabled).
+* `--hierarchical-slice-size <int>`: Slice size for the coarse pass (default: 4096).
+* `--use-erosion-merge / --no-use-erosion-merge`: Use erosion on the coarse mask (default: enabled).
+* `--use-color-validation / --no-use-color-validation`: Use color validation to merge masks (default: enabled).
 
-1.  **Image Loading & Pre-processing:** The image is loaded. It can be enhanced with downsampling (`--downsample-factor`) or contrast adjustment (`--clahe`). The full image is converted to the LAB color space on the CPU.
-2.  **Slicing:** The image is divided into smaller, overlapping tiles using SAHI, defined by `--slice-size` and `--slice-overlap`.
-3.  **Prompt Point Selection (Per Slice):** For each slice, the tool samples `n` points (`--num-points`) that represent water to "prompt" the SAM model. This involves:
-    * Transferring the LAB data for the slice to the GPU.
-    * Filtering a grid based on color distance (`--threshold`) and texture uniformity (`--uniformity-std-threshold`) to find the best candidate points.
-4.  **SAM Inference:** If a slice isn't obviously empty water (based on `--uniform-grid-thresh` and `--water-grid-thresh`), the prompt points are sent to SAM to generate a water mask for that slice. If no points are found, a fallback logic using brightness and color distance classifies the slice.
-5.  **Mask Reconstruction & Merging:** The individual masks from all slices are stitched together. In `--hierarchical` mode, this involves the intelligent merge of the coarse and fine passes.
-6.  **Output Generation:** The final kelp mask is used to calculate the coverage percentage, which is saved to a CSV file. Optional visualizations can also be generated.
+**Visualization:**
+* `--generate-overlay`: Generate a transparent overlay of the kelp mask on the original image.
+* `--generate-slice-viz`: Generate a grid visualization of all slices.
+* `--generate-erosion-viz`: Generate a visualization of the erosion merge effect.
+* `--generate-merge-viz`: Generate a heatmap visualization of the disagreement area during mask merging.
+
+---
 
 ### `debug-slice`
-Performs a detailed debug analysis on specific image slices, generating visualizations of the point selection pipeline.
+Debug the program on a particular slice(s).
 ```bash
 kelp-coverage debug-slice --image-path <path_to_image.JPG> --slice-index <index> --site <site_name> [options]
 ```
+**Arguments:**
+* `--image-path <path>`: **(Required)** One or more full paths to images to debug.
+* `--slice-index <indices>`: **(Required)** One or more slice indices to debug.
+* `--site <name>`: **(Required)** Site name.
+* `--heatmap`: Generate threshold visualization of color distances.
+* `--visualize-stages`: Visualize the point filtering pipeline step-by-step.
+
+---
 
 ### `heatmap`
-Generates a spatial heatmap from a combined coverage CSV file.
+Generates a spatial heatmap from a resulting json file.
 ```bash
-kelp-coverage heatmap --coverage-data <path_to_coverage.csv> [options]
+kelp-coverage heatmap --coverage-data <path_to_results.json> [options]
 ```
-
----
-
-## Full Argument Reference
-## Full Argument Reference
-
-### Core Model and Slicing Arguments
-| Argument | Default | Description |
-| --- | --- | --- |
-| `--sam-checkpoint` | `mobile_sam.pt` | Path to the SAM model checkpoint. |
-| `--use-mobile-sam` | `True` | Use the lightweight MobileSAM model. Disable with `--no-use-mobile-sam`. |
-| `--sam-model-type` | `vit_h` | Model type for standard SAM (e.g., `vit_h`, `vit_l`). Ignored for MobileSAM. |
-| `--slice-size` | `1024` | Size of the slices generated by SAHI. |
-| `--slice-overlap` | `0.2` | Overlap ratio between adjacent slices (0.0 to 1.0). |
-| `--padding` | `0` | Pixel padding to add to each slice before processing. |
-
-### Pre-processing and Point Selection
-| Argument | Default | Description |
-| --- | --- | --- |
-| `--clahe` | `False` | Apply Contrast Limited Adaptive Histogram Equalization (CLAHE). |
-| `--downsample-factor` | `1.0` | Factor to downsample the image by (e.g., 2.0 for half size). |
-| `--pixel-csv` | `pixel_values.csv` | Path to the CSV storing representative LAB pixel values. |
-| `--num-points` | `3` | Number of seed points provided to SAM. |
-| `--threshold` | `20` | LAB color distance threshold to identify water pixels. |
-| `--threshold-max` | `20` | Maximum LAB color threshold to search up to if no points are found. |
-| `--final-point-strategy` | `poisson_disk` | Algorithm for selecting final prompt points (`poisson_disk`, `center_bias`, `random`). |
-| `--grid-size` | `64` | Pixel size of the grid for initial point filtering. |
-| `--uniformity-check` | `True` | Enable/disable the grid uniformity check. Disable with `--no-uniformity-check`. |
-| `--uniformity-std-threshold` | `4.0` | Standard deviation threshold for a grid cell to be "uniform". |
-
-### Shortcut & Fallback Arguments
-| Argument | Default | Description |
-| --- | --- | --- |
-| `--uniform-grid-thresh` | `0.85` | Percentage of uniform grids required to shortcut SAM. |
-| `--water-grid-thresh` | `0.95` | Percentage of water-colored grids required to shortcut SAM. |
-| `--fallback-brightness-threshold` | `100.0` | Brightness threshold to classify a slice as water if no points are found. |
-| `--fallback-distance-threshold` | `55.0` | LAB color distance threshold to classify a slice as water if no points are found. |
-
-### Hierarchical Mode Arguments (`analyze` only)
-| Argument | Default | Description |
-| --- | --- | --- |
-| `--hierarchical` | `True` | Use the two-pass hierarchical method. Disable with `--no-hierarchical`. |
-| `--hierarchical-slice-size` | `4096` | Slice size for the coarse pass. |
-| `--use-erosion-merge` | `True` | Use erosion on the coarse mask. Disable with `--no-use-erosion-merge`. |
-| `--erosion-kernel-size` | `51` | Kernel size for the erosion merge. |
-| `--use-color-validation` | `True` | Use color validation to resolve mask disagreements. Disable with `--no-use-color-validation`. |
-| `--merge-color-threshold`| `15` | LAB color distance threshold for validating kelp in the merge disagreement zone. |
-| `--merge-lightness-threshold`| `75.0` | Lightness (L*) threshold for validating kelp in the merge disagreement zone. |
-
-### Output and Visualization Arguments
-| Argument | Default | Description |
-| --- | --- | --- |
-| `--verbose` / `-v` | `False` | Enable verbose output, including a list of all active flags. |
-| `--generate-overlay` | `False` | Generate a transparent overlay of the kelp mask on the original image. |
-| `--generate-slice-viz` | `False` | Generate a grid visualization of all processed slices. |
-| `--slice-viz-max-size` | `256` | Maximum dimension for slices in the visualization grid. |
-| `--generate-threshold-viz` | `False` | Generate a visualization of the color distance threshold for each slice. |
-| `--generate-erosion-viz` | `False` | [HIERARCHICAL] Generate a visualization of the erosion merge effect. |
-| `--generate-merge-viz` | `False` | [HIERARCHICAL] Generate a heatmap of the disagreement area during mask merging. |
-| `--overwrite` | `False` | Overwrite existing results for a site/parameter combination. |
-| `--coverage-only` | `False` | Only compute and save coverage values, skipping all visualization outputs. |
-
----
-## Examples
-
-**Standard Workflow:**
-
-1.  **Setup:** Download metadata and images for a project.
-    ```bash
-    kelp-coverage setup --tator-csv all_sites_metadata.csv --tator-token <your_api_token> --images 5
-    ```
-
-2.  **Analyze a single site with recommended hierarchical settings:**
-    ```bash
-    kelp-coverage analyze \
-      --site "hopkins-1_20250315T190000" \
-      --tator-csv all_sites_metadata.csv \
-      --hierarchical \
-      --generate-overlay
-    ```
-
-3.  **Analyze all sites with basic settings (faster, less accurate):**
-    ```bash
-    kelp-coverage analyze --tator-csv all_sites_metadata.csv --coverage-only
-    ```
-
-4.  **Debug a problematic image:**
-    ```bash
-    kelp-coverage debug-slice \
-      --site "hopkins-1_20250315T190000" \
-      --image-path "images/hopkins-1_20250315T190000/DSC01234.JPG" \
-      --slice-index 42 55 \
-      --visualize-stages \
-      --heatmap
-    ```
-
-5.  **Create a heatmap from results:**
-
-    ```bash    
-    kelp-coverage heatmap --coverage-data all_coverage.csv --show-points
-    ```
-
+**Arguments:**
+* `--coverage-data <path>`: **(Required)** Path to the results.json file from an analysis run.
+* `--output <path>`: Path to save the output heatmap image.
+* `--grid-size <int>`: Size of heatmap grid cells (default: 30).
+* `--show-grid-values`: Show numerical coverage values on the grid cells.
+* `--show-points`: Show the location of data points on the map.
+* `--show-point-labels`: Show labels for the data points.
