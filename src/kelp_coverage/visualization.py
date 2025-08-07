@@ -276,6 +276,7 @@ def run_sahi_sam_visualization(
     generate_slice_viz: bool = False,
     generate_threshold_viz: bool = False,
     generate_erosion_viz: bool = False,
+    generate_component_viz: bool = False,
     slice_viz_max_size: int = 256,
     coverage_only: bool = False,
     overwrite: bool = False,
@@ -371,16 +372,25 @@ def run_sahi_sam_visualization(
                             verbose=verbose,
                         )
 
-                    if generate_erosion_viz and isinstance(processor, HierarchicalProcessor):
-                        if hasattr(processor, "pre_erosion_mask") and processor.pre_erosion_mask is not None:
-                            _save_erosion_visualization(
-                                original_image=original_image,
-                                pre_erosion_mask=processor.pre_erosion_mask,
-                                post_erosion_mask=processor.post_erosion_mask,
-                                title=f"{image_base} | Erosion Effect (Kernel: {processor.erosion_kernel_size})",
-                                output_path=os.path.join(viz_dir, f"{image_base}_erosion_effect.png"),
+                    if generate_component_viz and isinstance(processor, HierarchicalProcessor):
+                        masks = processor.get_component_masks()
+                        _save_overlay(
+                            original_image,
+                            masks,
+                            f"{image_base} | Component Comparison",
+                                os.path.join(viz_dir, f"{image_base}_component_overlay.png"),
                                 verbose=verbose,
                             )
+
+                    if generate_erosion_viz and isinstance(processor, HierarchicalProcessor):
+                        _save_erosion_visualization(
+                            original_image=original_image,
+                            pre_erosion_mask=processor.pre_erosion_mask,
+                            post_erosion_mask=processor.post_erosion_mask,
+                            title=f"{image_base} | Erosion Effect (Kernel: {processor.erosion_kernel_size})",
+                            output_path=os.path.join(viz_dir, f"{image_base}_erosion_effect.png"),
+                            verbose=verbose,
+                        )
 
                     if generate_slice_viz:
                         if isinstance(processor, HierarchicalProcessor):

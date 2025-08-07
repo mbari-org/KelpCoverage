@@ -177,7 +177,8 @@ def _process_site(
         generate_overlay=args.generate_overlay,
         generate_slice_viz=args.generate_slice_viz,
         generate_threshold_viz=args.generate_threshold_viz,
-        generate_erosion_viz=getattr(args, "generate_erosion_viz", False),
+        generate_erosion_viz=args.generate_erosion_viz,
+        generate_component_viz=args.generate_component_viz,
         slice_viz_max_size=args.slice_viz_max_size,
         coverage_only=args.coverage_only,
         overwrite=args.overwrite,
@@ -559,6 +560,11 @@ def main() -> None:
         "--generate-erosion-viz",
         action="store_true",
         help="[HIERARCHICAL] Generate a visualization of the erosion merge effect.",
+    )
+    analyze_parser.add_argument(
+        "--generate-component-viz",
+        action="store_true",
+        help="[HIERARCHICAL] Generate a visualization of the fine and coarse masks overlayed.",
     )
 
     # Hierarchical Merging: Color Validation

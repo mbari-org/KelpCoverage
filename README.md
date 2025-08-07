@@ -191,6 +191,7 @@ kelp-coverage analyze --site <site_name> --tator-csv <path_to_metadata.csv> [opt
 * `--generate-slice-viz`: Generate a grid visualization of all slices.
 * `--generate-erosion-viz`: Generate a visualization of the erosion merge effect.
 * `--generate-merge-viz`: Generate a heatmap visualization of the disagreement area during mask merging.
+* `--generate-component-viz`: Generate a visualization of the fine and coarse masks overlayed.
 
 ---
 
