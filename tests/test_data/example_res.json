@@ -1,0 +1,3891 @@
+{
+    "command": "/usr/local/bin/kelp-coverage analyze --tator-csv seymour2.csv --site trinity-2_20250404T173830 --image /content/images/trinity-2_20250404T173830/trinity-2_20250404T173830_Seymour_DSC02484.JPG --verbose --generate-merge-viz --generate-overlay",
+    "run_args": {
+        "command": "analyze",
+        "sam_checkpoint": "mobile_sam.pt",
+        "use_mobile_sam": true,
+        "sam_model_type": "vit_h",
+        "slice_size": 1024,
+        "slice_overlap": 0.2,
+        "padding": 0,
+        "clahe": false,
+        "downsample_factor": 1.0,
+        "pixel_csv": "pixel_values.csv",
+        "num_points": 3,
+        "threshold": 20,
+        "threshold_max": 20,
+        "final_point_strategy": "poisson_disk",
+        "grid_size": 64,
+        "uniformity_check": true,
+        "uniformity_std_threshold": 4.0,
+        "uniform_grid_thresh": 0.98,
+        "water_grid_thresh": 0.98,
+        "fallback_brightness_threshold": 100.0,
+        "fallback_distance_threshold": 55.0,
+        "verbose": true,
+        "site": "trinity-2_20250404T173830",
+        "tator_csv": "seymour2.csv",
+        "images": "/content/images/trinity-2_20250404T173830/trinity-2_20250404T173830_Seymour_DSC01940.JPG",
+        "count": -1,
+        "gpu_batch_size": 32,
+        "generate_overlay": true,
+        "generate_slice_viz": false,
+        "slice_viz_max_size": 256,
+        "generate_threshold_viz": false,
+        "hierarchical": true,
+        "hierarchical_slice_size": 4096,
+        "use_erosion_merge": true,
+        "erosion_kernel_size": 51,
+        "generate_erosion_viz": false,
+        "use_color_validation": true,
+        "color_validation_threshold": 50,
+        "generate_merge_viz": true,
+        "merge_color_threshold": 15,
+        "merge_lightness_threshold": 75.0,
+        "overwrite": false,
+        "coverage_only": false,
+        "site_name": "Seymour"
+    },
+    "results": [
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01940.JPG",
+            "image_id": 444337,
+            "latitude": 36.9458525,
+            "longitude": 122.0570011,
+            "coverage_percentage": 3.513241,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01941.JPG",
+            "image_id": 444338,
+            "latitude": 36.9459866,
+            "longitude": 122.0573177,
+            "coverage_percentage": 5.3079601,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01942.JPG",
+            "image_id": 444339,
+            "latitude": 36.9461185,
+            "longitude": 122.0576164,
+            "coverage_percentage": 2.1160689,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01943.JPG",
+            "image_id": 444340,
+            "latitude": 36.946252,
+            "longitude": 122.0579324,
+            "coverage_percentage": 0.1938526,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01944.JPG",
+            "image_id": 444341,
+            "latitude": 36.9462031,
+            "longitude": 122.0593063,
+            "coverage_percentage": 0.6211145,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01945.JPG",
+            "image_id": 444342,
+            "latitude": 36.9461457,
+            "longitude": 122.058962,
+            "coverage_percentage": 0.1001934,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01946.JPG",
+            "image_id": 444343,
+            "latitude": 36.9460926,
+            "longitude": 122.0586242,
+            "coverage_percentage": 0.8196995,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01947.JPG",
+            "image_id": 444344,
+            "latitude": 36.945984,
+            "longitude": 122.0583109,
+            "coverage_percentage": 0.165169,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01948.JPG",
+            "image_id": 444345,
+            "latitude": 36.9458378,
+            "longitude": 122.0580215,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01949.JPG",
+            "image_id": 444346,
+            "latitude": 36.9456938,
+            "longitude": 122.0577221,
+            "coverage_percentage": 1.8813555,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01950.JPG",
+            "image_id": 444347,
+            "latitude": 36.9455649,
+            "longitude": 122.057417,
+            "coverage_percentage": 1.4832301,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01951.JPG",
+            "image_id": 444348,
+            "latitude": 36.945442,
+            "longitude": 122.0571056,
+            "coverage_percentage": 0.0609212,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01952.JPG",
+            "image_id": 444349,
+            "latitude": 36.9450275,
+            "longitude": 122.0573384,
+            "coverage_percentage": 0.0002063,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01953.JPG",
+            "image_id": 444350,
+            "latitude": 36.9452017,
+            "longitude": 122.0576053,
+            "coverage_percentage": 0.0028119,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01954.JPG",
+            "image_id": 444351,
+            "latitude": 36.9453422,
+            "longitude": 122.0579051,
+            "coverage_percentage": 0.0003983,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01955.JPG",
+            "image_id": 444352,
+            "latitude": 36.9454517,
+            "longitude": 122.0582236,
+            "coverage_percentage": 0.0001375,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01956.JPG",
+            "image_id": 444353,
+            "latitude": 36.945564,
+            "longitude": 122.0585438,
+            "coverage_percentage": 0.0007587,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01957.JPG",
+            "image_id": 444354,
+            "latitude": 36.9456902,
+            "longitude": 122.0588528,
+            "coverage_percentage": 0.0755902,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01958.JPG",
+            "image_id": 444355,
+            "latitude": 36.9458252,
+            "longitude": 122.0591633,
+            "coverage_percentage": 0.0348433,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01959.JPG",
+            "image_id": 444356,
+            "latitude": 36.9459534,
+            "longitude": 122.0594705,
+            "coverage_percentage": 0.0443768,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01960.JPG",
+            "image_id": 444357,
+            "latitude": 36.9460773,
+            "longitude": 122.0597744,
+            "coverage_percentage": 0.5586545,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01961.JPG",
+            "image_id": 444358,
+            "latitude": 36.946199,
+            "longitude": 122.0600864,
+            "coverage_percentage": 1.3021189,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01962.JPG",
+            "image_id": 444359,
+            "latitude": 36.9463226,
+            "longitude": 122.0603918,
+            "coverage_percentage": 0.0037911,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01963.JPG",
+            "image_id": 444360,
+            "latitude": 36.9462771,
+            "longitude": 122.061782,
+            "coverage_percentage": 6.1098586,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01964.JPG",
+            "image_id": 444361,
+            "latitude": 36.9462156,
+            "longitude": 122.0614559,
+            "coverage_percentage": 2.5366163,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01965.JPG",
+            "image_id": 444362,
+            "latitude": 36.9461712,
+            "longitude": 122.0611222,
+            "coverage_percentage": 0.0012969,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01966.JPG",
+            "image_id": 444363,
+            "latitude": 36.9460695,
+            "longitude": 122.060806,
+            "coverage_percentage": 0.0001304,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01967.JPG",
+            "image_id": 444364,
+            "latitude": 36.9459277,
+            "longitude": 122.060519,
+            "coverage_percentage": 1.2008775,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01968.JPG",
+            "image_id": 444365,
+            "latitude": 36.9457823,
+            "longitude": 122.0602277,
+            "coverage_percentage": 0.5039285,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01969.JPG",
+            "image_id": 444366,
+            "latitude": 36.9456515,
+            "longitude": 122.0599277,
+            "coverage_percentage": 3.08e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01970.JPG",
+            "image_id": 444367,
+            "latitude": 36.9455369,
+            "longitude": 122.0596144,
+            "coverage_percentage": 4.7e-06,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01971.JPG",
+            "image_id": 444368,
+            "latitude": 36.9454222,
+            "longitude": 122.0592964,
+            "coverage_percentage": 0.0001992,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01972.JPG",
+            "image_id": 444369,
+            "latitude": 36.9452971,
+            "longitude": 122.0589909,
+            "coverage_percentage": 3.32e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01973.JPG",
+            "image_id": 444370,
+            "latitude": 36.9451644,
+            "longitude": 122.0586901,
+            "coverage_percentage": 0.0002727,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01974.JPG",
+            "image_id": 444371,
+            "latitude": 36.9450336,
+            "longitude": 122.0583856,
+            "coverage_percentage": 5.93e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01975.JPG",
+            "image_id": 444372,
+            "latitude": 36.9449072,
+            "longitude": 122.058078,
+            "coverage_percentage": 9.25e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01976.JPG",
+            "image_id": 444373,
+            "latitude": 36.9447861,
+            "longitude": 122.0577711,
+            "coverage_percentage": 0.0002395,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01977.JPG",
+            "image_id": 444374,
+            "latitude": 36.9443292,
+            "longitude": 122.0579737,
+            "coverage_percentage": 0.0001849,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01978.JPG",
+            "image_id": 444375,
+            "latitude": 36.9445205,
+            "longitude": 122.0582326,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01979.JPG",
+            "image_id": 444376,
+            "latitude": 36.9446741,
+            "longitude": 122.0585225,
+            "coverage_percentage": 0.0001375,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01980.JPG",
+            "image_id": 444377,
+            "latitude": 36.9447873,
+            "longitude": 122.0588451,
+            "coverage_percentage": 0.0027171,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01981.JPG",
+            "image_id": 444378,
+            "latitude": 36.9448894,
+            "longitude": 122.059171,
+            "coverage_percentage": 0.0006425,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01982.JPG",
+            "image_id": 444379,
+            "latitude": 36.9450056,
+            "longitude": 122.0594852,
+            "coverage_percentage": 0.0046281,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01983.JPG",
+            "image_id": 444380,
+            "latitude": 36.9451364,
+            "longitude": 122.0597875,
+            "coverage_percentage": 0.0002964,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01984.JPG",
+            "image_id": 444381,
+            "latitude": 36.9452683,
+            "longitude": 122.0600882,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01985.JPG",
+            "image_id": 444382,
+            "latitude": 36.945396,
+            "longitude": 122.0603899,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01986.JPG",
+            "image_id": 444383,
+            "latitude": 36.9455219,
+            "longitude": 122.0606971,
+            "coverage_percentage": 0.0857829,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01987.JPG",
+            "image_id": 444384,
+            "latitude": 36.9456412,
+            "longitude": 122.0610018,
+            "coverage_percentage": 0.0004339,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01988.JPG",
+            "image_id": 444385,
+            "latitude": 36.9457639,
+            "longitude": 122.0613074,
+            "coverage_percentage": 0.0005358,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01989.JPG",
+            "image_id": 444386,
+            "latitude": 36.9458884,
+            "longitude": 122.0616142,
+            "coverage_percentage": 1.5117856,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01990.JPG",
+            "image_id": 444387,
+            "latitude": 36.9460083,
+            "longitude": 122.061915,
+            "coverage_percentage": 4.867907,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01991.JPG",
+            "image_id": 444388,
+            "latitude": 36.9461358,
+            "longitude": 122.0622213,
+            "coverage_percentage": 5.6995892,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01992.JPG",
+            "image_id": 444389,
+            "latitude": 36.9462599,
+            "longitude": 122.0625193,
+            "coverage_percentage": 12.3077193,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01993.JPG",
+            "image_id": 444390,
+            "latitude": 36.9463876,
+            "longitude": 122.062824,
+            "coverage_percentage": 13.537188,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01994.JPG",
+            "image_id": 444391,
+            "latitude": 36.9463472,
+            "longitude": 122.0642584,
+            "coverage_percentage": 2.1080361,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01996.JPG",
+            "image_id": 444393,
+            "latitude": 36.9462478,
+            "longitude": 122.063594,
+            "coverage_percentage": 9.5106745,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01997.JPG",
+            "image_id": 444394,
+            "latitude": 36.9461482,
+            "longitude": 122.0632782,
+            "coverage_percentage": 8.4455214,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01998.JPG",
+            "image_id": 444395,
+            "latitude": 36.9460089,
+            "longitude": 122.0629879,
+            "coverage_percentage": 5.8929012,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01999.JPG",
+            "image_id": 444396,
+            "latitude": 36.9458689,
+            "longitude": 122.0626917,
+            "coverage_percentage": 2.3421615,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02000.JPG",
+            "image_id": 444397,
+            "latitude": 36.945736,
+            "longitude": 122.062388,
+            "coverage_percentage": 2.85e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02001.JPG",
+            "image_id": 444398,
+            "latitude": 36.9456128,
+            "longitude": 122.0620756,
+            "coverage_percentage": 9.72e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02002.JPG",
+            "image_id": 444399,
+            "latitude": 36.9454934,
+            "longitude": 122.0617689,
+            "coverage_percentage": 0.0001423,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02003.JPG",
+            "image_id": 444400,
+            "latitude": 36.945372,
+            "longitude": 122.0614612,
+            "coverage_percentage": 0.0001968,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02004.JPG",
+            "image_id": 444401,
+            "latitude": 36.9452435,
+            "longitude": 122.0611544,
+            "coverage_percentage": 0.0002324,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02005.JPG",
+            "image_id": 444402,
+            "latitude": 36.9451173,
+            "longitude": 122.0608532,
+            "coverage_percentage": 0.0001873,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02006.JPG",
+            "image_id": 444403,
+            "latitude": 36.9449854,
+            "longitude": 122.060551,
+            "coverage_percentage": 0.0029068,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02007.JPG",
+            "image_id": 444404,
+            "latitude": 36.9448568,
+            "longitude": 122.0602457,
+            "coverage_percentage": 9.25e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02008.JPG",
+            "image_id": 444405,
+            "latitude": 36.9447296,
+            "longitude": 122.0599369,
+            "coverage_percentage": 0.0001778,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02009.JPG",
+            "image_id": 444406,
+            "latitude": 36.9446086,
+            "longitude": 122.0596321,
+            "coverage_percentage": 3.08e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02010.JPG",
+            "image_id": 444407,
+            "latitude": 36.9444846,
+            "longitude": 122.0593116,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02011.JPG",
+            "image_id": 444408,
+            "latitude": 36.944358,
+            "longitude": 122.0589985,
+            "coverage_percentage": 0.0003082,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02012.JPG",
+            "image_id": 444409,
+            "latitude": 36.9442342,
+            "longitude": 122.0586879,
+            "coverage_percentage": 0.000128,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02013.JPG",
+            "image_id": 444410,
+            "latitude": 36.9441107,
+            "longitude": 122.0583749,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02014.JPG",
+            "image_id": 444411,
+            "latitude": 36.944008,
+            "longitude": 122.0581313,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02015.JPG",
+            "image_id": 444412,
+            "latitude": 36.943664,
+            "longitude": 122.0585923,
+            "coverage_percentage": 2.37e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02016.JPG",
+            "image_id": 444413,
+            "latitude": 36.9438344,
+            "longitude": 122.0588277,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02017.JPG",
+            "image_id": 444414,
+            "latitude": 36.9439761,
+            "longitude": 122.0590989,
+            "coverage_percentage": 5.69e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02018.JPG",
+            "image_id": 444415,
+            "latitude": 36.9440836,
+            "longitude": 122.0594018,
+            "coverage_percentage": 0.0113212,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02019.JPG",
+            "image_id": 444416,
+            "latitude": 36.9441805,
+            "longitude": 122.0597123,
+            "coverage_percentage": 0.0019513,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02020.JPG",
+            "image_id": 444417,
+            "latitude": 36.9442942,
+            "longitude": 122.0600163,
+            "coverage_percentage": 0.0005287,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02021.JPG",
+            "image_id": 444418,
+            "latitude": 36.9444252,
+            "longitude": 122.0603152,
+            "coverage_percentage": 0.0048367,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02022.JPG",
+            "image_id": 444419,
+            "latitude": 36.9445528,
+            "longitude": 122.0606102,
+            "coverage_percentage": 0.0006496,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02023.JPG",
+            "image_id": 444420,
+            "latitude": 36.9446771,
+            "longitude": 122.060915,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02024.JPG",
+            "image_id": 444421,
+            "latitude": 36.9447964,
+            "longitude": 122.0612163,
+            "coverage_percentage": 0.0045095,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02025.JPG",
+            "image_id": 444422,
+            "latitude": 36.9449176,
+            "longitude": 122.0615238,
+            "coverage_percentage": 0.0041065,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02026.JPG",
+            "image_id": 444423,
+            "latitude": 36.9450399,
+            "longitude": 122.0618297,
+            "coverage_percentage": 0.0056737,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02027.JPG",
+            "image_id": 444424,
+            "latitude": 36.945168,
+            "longitude": 122.062136,
+            "coverage_percentage": 0.0005406,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02028.JPG",
+            "image_id": 444425,
+            "latitude": 36.9452971,
+            "longitude": 122.0624424,
+            "coverage_percentage": 0.0002489,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02029.JPG",
+            "image_id": 444426,
+            "latitude": 36.9454197,
+            "longitude": 122.0627471,
+            "coverage_percentage": 0.0008962,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02030.JPG",
+            "image_id": 444427,
+            "latitude": 36.9455452,
+            "longitude": 122.0630576,
+            "coverage_percentage": 0.1319711,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02031.JPG",
+            "image_id": 444428,
+            "latitude": 36.9456712,
+            "longitude": 122.0633594,
+            "coverage_percentage": 2.1427585,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02032.JPG",
+            "image_id": 444429,
+            "latitude": 36.9457982,
+            "longitude": 122.0636692,
+            "coverage_percentage": 4.094538,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02033.JPG",
+            "image_id": 444430,
+            "latitude": 36.9459244,
+            "longitude": 122.0639794,
+            "coverage_percentage": 6.1642029,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02034.JPG",
+            "image_id": 444431,
+            "latitude": 36.9460464,
+            "longitude": 122.0642858,
+            "coverage_percentage": 4.7419225,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02035.JPG",
+            "image_id": 444432,
+            "latitude": 36.946172,
+            "longitude": 122.064593,
+            "coverage_percentage": 3.9676525,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02036.JPG",
+            "image_id": 444433,
+            "latitude": 36.9463003,
+            "longitude": 122.0648953,
+            "coverage_percentage": 5.9731907,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02037.JPG",
+            "image_id": 444434,
+            "latitude": 36.9464258,
+            "longitude": 122.0651978,
+            "coverage_percentage": 6.4281025,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02038.JPG",
+            "image_id": 444435,
+            "latitude": 36.9465478,
+            "longitude": 122.0655018,
+            "coverage_percentage": 10.7746735,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02039.JPG",
+            "image_id": 444436,
+            "latitude": 36.9464445,
+            "longitude": 122.0667284,
+            "coverage_percentage": 0.7923128,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02040.JPG",
+            "image_id": 444437,
+            "latitude": 36.9463752,
+            "longitude": 122.0663936,
+            "coverage_percentage": 6.6081562,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02041.JPG",
+            "image_id": 444438,
+            "latitude": 36.946319,
+            "longitude": 122.066057,
+            "coverage_percentage": 18.1715956,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02042.JPG",
+            "image_id": 444439,
+            "latitude": 36.9462184,
+            "longitude": 122.0657418,
+            "coverage_percentage": 11.8835207,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02043.JPG",
+            "image_id": 444440,
+            "latitude": 36.9460787,
+            "longitude": 122.0654386,
+            "coverage_percentage": 2.2328328,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02044.JPG",
+            "image_id": 444441,
+            "latitude": 36.945935,
+            "longitude": 122.0651348,
+            "coverage_percentage": 0.6353638,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02045.JPG",
+            "image_id": 444442,
+            "latitude": 36.9458006,
+            "longitude": 122.0648284,
+            "coverage_percentage": 1.7016574,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02046.JPG",
+            "image_id": 444443,
+            "latitude": 36.9456781,
+            "longitude": 122.0645217,
+            "coverage_percentage": 2.1864999,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02047.JPG",
+            "image_id": 444444,
+            "latitude": 36.9455573,
+            "longitude": 122.0642095,
+            "coverage_percentage": 0.896103,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02048.JPG",
+            "image_id": 444445,
+            "latitude": 36.9454341,
+            "longitude": 122.0639024,
+            "coverage_percentage": 1.0674554,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02049.JPG",
+            "image_id": 444446,
+            "latitude": 36.9453053,
+            "longitude": 122.0636021,
+            "coverage_percentage": 0.115927,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02050.JPG",
+            "image_id": 444447,
+            "latitude": 36.9451734,
+            "longitude": 122.0632986,
+            "coverage_percentage": 0.0002371,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02051.JPG",
+            "image_id": 444448,
+            "latitude": 36.9450491,
+            "longitude": 122.0629928,
+            "coverage_percentage": 0.0004149,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02052.JPG",
+            "image_id": 444449,
+            "latitude": 36.9449281,
+            "longitude": 122.0626851,
+            "coverage_percentage": 0.0001091,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02053.JPG",
+            "image_id": 444450,
+            "latitude": 36.9448063,
+            "longitude": 122.0623792,
+            "coverage_percentage": 5.69e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02054.JPG",
+            "image_id": 444451,
+            "latitude": 36.9446828,
+            "longitude": 122.0620678,
+            "coverage_percentage": 0.0403083,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02055.JPG",
+            "image_id": 444452,
+            "latitude": 36.9445584,
+            "longitude": 122.0617655,
+            "coverage_percentage": 0.0510771,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02056.JPG",
+            "image_id": 444453,
+            "latitude": 36.9444284,
+            "longitude": 122.0614571,
+            "coverage_percentage": 4.7e-06,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02057.JPG",
+            "image_id": 444454,
+            "latitude": 36.9443018,
+            "longitude": 122.0611542,
+            "coverage_percentage": 8.77e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02058.JPG",
+            "image_id": 444455,
+            "latitude": 36.9441764,
+            "longitude": 122.0608505,
+            "coverage_percentage": 7.1e-06,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02059.JPG",
+            "image_id": 444456,
+            "latitude": 36.9440523,
+            "longitude": 122.0605338,
+            "coverage_percentage": 2.37e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02060.JPG",
+            "image_id": 444457,
+            "latitude": 36.9439294,
+            "longitude": 122.0602249,
+            "coverage_percentage": 0.0001209,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02061.JPG",
+            "image_id": 444458,
+            "latitude": 36.943803,
+            "longitude": 122.0599205,
+            "coverage_percentage": 0.000569,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02062.JPG",
+            "image_id": 444459,
+            "latitude": 36.9436765,
+            "longitude": 122.0596149,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02063.JPG",
+            "image_id": 444460,
+            "latitude": 36.9435488,
+            "longitude": 122.0593112,
+            "coverage_percentage": 0.0001612,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02064.JPG",
+            "image_id": 444461,
+            "latitude": 36.9434263,
+            "longitude": 122.0590062,
+            "coverage_percentage": 0.0002916,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02065.JPG",
+            "image_id": 444462,
+            "latitude": 36.9430761,
+            "longitude": 122.0593715,
+            "coverage_percentage": 0.0016099,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02066.JPG",
+            "image_id": 444463,
+            "latitude": 36.9432553,
+            "longitude": 122.059632,
+            "coverage_percentage": 0.0030467,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02067.JPG",
+            "image_id": 444464,
+            "latitude": 36.9433804,
+            "longitude": 122.0599299,
+            "coverage_percentage": 0.0013064,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02068.JPG",
+            "image_id": 444465,
+            "latitude": 36.9434801,
+            "longitude": 122.0602416,
+            "coverage_percentage": 0.0008772,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02069.JPG",
+            "image_id": 444466,
+            "latitude": 36.9435867,
+            "longitude": 122.0605567,
+            "coverage_percentage": 0.0012281,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02070.JPG",
+            "image_id": 444467,
+            "latitude": 36.9437096,
+            "longitude": 122.0608661,
+            "coverage_percentage": 0.0004363,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02071.JPG",
+            "image_id": 444468,
+            "latitude": 36.9438416,
+            "longitude": 122.06117,
+            "coverage_percentage": 0.000524,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02072.JPG",
+            "image_id": 444469,
+            "latitude": 36.9439733,
+            "longitude": 122.0614726,
+            "coverage_percentage": 0.0007468,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02073.JPG",
+            "image_id": 444470,
+            "latitude": 36.9441012,
+            "longitude": 122.0617788,
+            "coverage_percentage": 0.0009555,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02074.JPG",
+            "image_id": 444471,
+            "latitude": 36.9442294,
+            "longitude": 122.0620844,
+            "coverage_percentage": 0.0002774,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02075.JPG",
+            "image_id": 444472,
+            "latitude": 36.9443478,
+            "longitude": 122.0623999,
+            "coverage_percentage": 0.0126679,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02076.JPG",
+            "image_id": 444473,
+            "latitude": 36.9444636,
+            "longitude": 122.0627157,
+            "coverage_percentage": 0.0067216,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02077.JPG",
+            "image_id": 444474,
+            "latitude": 36.9445878,
+            "longitude": 122.063022,
+            "coverage_percentage": 0.005676,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02078.JPG",
+            "image_id": 444475,
+            "latitude": 36.944718,
+            "longitude": 122.0633296,
+            "coverage_percentage": 0.0089479,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02079.JPG",
+            "image_id": 444476,
+            "latitude": 36.9448463,
+            "longitude": 122.0636332,
+            "coverage_percentage": 0.0021907,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02080.JPG",
+            "image_id": 444477,
+            "latitude": 36.9449736,
+            "longitude": 122.0639418,
+            "coverage_percentage": 0.0033264,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02081.JPG",
+            "image_id": 444478,
+            "latitude": 36.9451012,
+            "longitude": 122.0642468,
+            "coverage_percentage": 0.0023804,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02082.JPG",
+            "image_id": 444479,
+            "latitude": 36.9452225,
+            "longitude": 122.0645492,
+            "coverage_percentage": 0.0461859,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02083.JPG",
+            "image_id": 444480,
+            "latitude": 36.9453456,
+            "longitude": 122.0648586,
+            "coverage_percentage": 0.246862,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02084.JPG",
+            "image_id": 444481,
+            "latitude": 36.9454727,
+            "longitude": 122.065163,
+            "coverage_percentage": 0.6578996,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02085.JPG",
+            "image_id": 444482,
+            "latitude": 36.9455991,
+            "longitude": 122.0654598,
+            "coverage_percentage": 0.4751145,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02086.JPG",
+            "image_id": 444483,
+            "latitude": 36.9457255,
+            "longitude": 122.0657654,
+            "coverage_percentage": 0.3404903,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02087.JPG",
+            "image_id": 444484,
+            "latitude": 36.9458481,
+            "longitude": 122.0660701,
+            "coverage_percentage": 2.6315961,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02088.JPG",
+            "image_id": 444485,
+            "latitude": 36.9459741,
+            "longitude": 122.0663777,
+            "coverage_percentage": 6.7939453,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02089.JPG",
+            "image_id": 444486,
+            "latitude": 36.9460964,
+            "longitude": 122.0666817,
+            "coverage_percentage": 2.9124455,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02090.JPG",
+            "image_id": 444487,
+            "latitude": 36.9462178,
+            "longitude": 122.0669843,
+            "coverage_percentage": 1.0512618,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02091.JPG",
+            "image_id": 444488,
+            "latitude": 36.9463453,
+            "longitude": 122.067293,
+            "coverage_percentage": 0.8894572,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02092.JPG",
+            "image_id": 444489,
+            "latitude": 36.9464719,
+            "longitude": 122.0675972,
+            "coverage_percentage": 0.0088033,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02093.JPG",
+            "image_id": 444490,
+            "latitude": 36.9465965,
+            "longitude": 122.0679011,
+            "coverage_percentage": 1.3308381,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02094.JPG",
+            "image_id": 444491,
+            "latitude": 36.9465278,
+            "longitude": 122.0691996,
+            "coverage_percentage": 4.999373,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02095.JPG",
+            "image_id": 444492,
+            "latitude": 36.9464477,
+            "longitude": 122.0688668,
+            "coverage_percentage": 0.8857894,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02096.JPG",
+            "image_id": 444493,
+            "latitude": 36.9463915,
+            "longitude": 122.0685371,
+            "coverage_percentage": 1.1879702,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02097.JPG",
+            "image_id": 444494,
+            "latitude": 36.9462912,
+            "longitude": 122.0682172,
+            "coverage_percentage": 0.6101608,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02098.JPG",
+            "image_id": 444495,
+            "latitude": 36.9461542,
+            "longitude": 122.0679142,
+            "coverage_percentage": 0.0138534,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02099.JPG",
+            "image_id": 444496,
+            "latitude": 36.9460112,
+            "longitude": 122.0676176,
+            "coverage_percentage": 0.0009176,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02100.JPG",
+            "image_id": 444497,
+            "latitude": 36.9458788,
+            "longitude": 122.0673058,
+            "coverage_percentage": 0.2284944,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02101.JPG",
+            "image_id": 444498,
+            "latitude": 36.9457576,
+            "longitude": 122.0669954,
+            "coverage_percentage": 0.2368851,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02102.JPG",
+            "image_id": 444499,
+            "latitude": 36.9456331,
+            "longitude": 122.0666825,
+            "coverage_percentage": 0.0004789,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02103.JPG",
+            "image_id": 444500,
+            "latitude": 36.9455072,
+            "longitude": 122.066376,
+            "coverage_percentage": 0.0388739,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02104.JPG",
+            "image_id": 444501,
+            "latitude": 36.9453787,
+            "longitude": 122.0660756,
+            "coverage_percentage": 0.3735246,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02105.JPG",
+            "image_id": 444502,
+            "latitude": 36.9452521,
+            "longitude": 122.0657655,
+            "coverage_percentage": 0.2150606,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02106.JPG",
+            "image_id": 444503,
+            "latitude": 36.9451282,
+            "longitude": 122.0654566,
+            "coverage_percentage": 0.0007042,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02107.JPG",
+            "image_id": 444504,
+            "latitude": 36.945005,
+            "longitude": 122.0651562,
+            "coverage_percentage": 6.16e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02108.JPG",
+            "image_id": 444505,
+            "latitude": 36.9448789,
+            "longitude": 122.0648512,
+            "coverage_percentage": 0.0003177,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02109.JPG",
+            "image_id": 444506,
+            "latitude": 36.9447525,
+            "longitude": 122.0645432,
+            "coverage_percentage": 0.0018043,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02110.JPG",
+            "image_id": 444507,
+            "latitude": 36.9446284,
+            "longitude": 122.0642376,
+            "coverage_percentage": 0.0014581,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02111.JPG",
+            "image_id": 444508,
+            "latitude": 36.9445046,
+            "longitude": 122.0639301,
+            "coverage_percentage": 0.0002205,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02112.JPG",
+            "image_id": 444509,
+            "latitude": 36.9443808,
+            "longitude": 122.0636237,
+            "coverage_percentage": 0.0004694,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02113.JPG",
+            "image_id": 444510,
+            "latitude": 36.9442554,
+            "longitude": 122.0633175,
+            "coverage_percentage": 0.0005335,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02114.JPG",
+            "image_id": 444511,
+            "latitude": 36.9441307,
+            "longitude": 122.0630172,
+            "coverage_percentage": 0.0248119,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02115.JPG",
+            "image_id": 444512,
+            "latitude": 36.9440028,
+            "longitude": 122.0627093,
+            "coverage_percentage": 0.0011357,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02116.JPG",
+            "image_id": 444513,
+            "latitude": 36.9438799,
+            "longitude": 122.0624045,
+            "coverage_percentage": 0.0016265,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02117.JPG",
+            "image_id": 444514,
+            "latitude": 36.9437551,
+            "longitude": 122.062094,
+            "coverage_percentage": 0.000377,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02118.JPG",
+            "image_id": 444515,
+            "latitude": 36.9436292,
+            "longitude": 122.0617848,
+            "coverage_percentage": 0.000313,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02119.JPG",
+            "image_id": 444516,
+            "latitude": 36.9435046,
+            "longitude": 122.0614834,
+            "coverage_percentage": 0.0008203,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02120.JPG",
+            "image_id": 444517,
+            "latitude": 36.9433781,
+            "longitude": 122.0611673,
+            "coverage_percentage": 0.001029,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02121.JPG",
+            "image_id": 444518,
+            "latitude": 36.9432535,
+            "longitude": 122.060861,
+            "coverage_percentage": 0.0002798,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02122.JPG",
+            "image_id": 444519,
+            "latitude": 36.943128,
+            "longitude": 122.0605513,
+            "coverage_percentage": 0.0003011,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02123.JPG",
+            "image_id": 444520,
+            "latitude": 36.9430021,
+            "longitude": 122.060243,
+            "coverage_percentage": 0.000588,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02124.JPG",
+            "image_id": 444521,
+            "latitude": 36.9428762,
+            "longitude": 122.059943,
+            "coverage_percentage": 0.000965,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02125.JPG",
+            "image_id": 444522,
+            "latitude": 36.9427183,
+            "longitude": 122.0606686,
+            "coverage_percentage": 0.0006662,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02126.JPG",
+            "image_id": 444523,
+            "latitude": 36.9428669,
+            "longitude": 122.060958,
+            "coverage_percentage": 0.0015506,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02127.JPG",
+            "image_id": 444524,
+            "latitude": 36.9429766,
+            "longitude": 122.0612773,
+            "coverage_percentage": 0.0028807,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02128.JPG",
+            "image_id": 444525,
+            "latitude": 36.9430784,
+            "longitude": 122.0615956,
+            "coverage_percentage": 0.0150246,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02129.JPG",
+            "image_id": 444526,
+            "latitude": 36.9431951,
+            "longitude": 122.0619051,
+            "coverage_percentage": 0.0019963,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02130.JPG",
+            "image_id": 444527,
+            "latitude": 36.9433291,
+            "longitude": 122.0622093,
+            "coverage_percentage": 0.0933391,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02131.JPG",
+            "image_id": 444528,
+            "latitude": 36.9434645,
+            "longitude": 122.0625076,
+            "coverage_percentage": 0.0038457,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02132.JPG",
+            "image_id": 444529,
+            "latitude": 36.9435892,
+            "longitude": 122.0628098,
+            "coverage_percentage": 0.0136945,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02133.JPG",
+            "image_id": 444530,
+            "latitude": 36.9437072,
+            "longitude": 122.0631211,
+            "coverage_percentage": 0.1232935,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02134.JPG",
+            "image_id": 444531,
+            "latitude": 36.9438278,
+            "longitude": 122.0634335,
+            "coverage_percentage": 0.0054342,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02135.JPG",
+            "image_id": 444532,
+            "latitude": 36.9439565,
+            "longitude": 122.0637473,
+            "coverage_percentage": 0.014439,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02136.JPG",
+            "image_id": 444533,
+            "latitude": 36.9440823,
+            "longitude": 122.06405,
+            "coverage_percentage": 0.0027408,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02137.JPG",
+            "image_id": 444534,
+            "latitude": 36.9442077,
+            "longitude": 122.0643489,
+            "coverage_percentage": 0.004941,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02138.JPG",
+            "image_id": 444535,
+            "latitude": 36.9443361,
+            "longitude": 122.0646484,
+            "coverage_percentage": 0.0006591,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02139.JPG",
+            "image_id": 444536,
+            "latitude": 36.9444626,
+            "longitude": 122.0649527,
+            "coverage_percentage": 0.0088958,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02140.JPG",
+            "image_id": 444537,
+            "latitude": 36.9445863,
+            "longitude": 122.0652601,
+            "coverage_percentage": 0.0312087,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02141.JPG",
+            "image_id": 444538,
+            "latitude": 36.9447062,
+            "longitude": 122.0655666,
+            "coverage_percentage": 0.0157525,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02142.JPG",
+            "image_id": 444539,
+            "latitude": 36.9448314,
+            "longitude": 122.0658804,
+            "coverage_percentage": 0.0087251,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02143.JPG",
+            "image_id": 444540,
+            "latitude": 36.9449583,
+            "longitude": 122.0661917,
+            "coverage_percentage": 0.3806588,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02144.JPG",
+            "image_id": 444541,
+            "latitude": 36.9450888,
+            "longitude": 122.0664953,
+            "coverage_percentage": 0.1706222,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02145.JPG",
+            "image_id": 444542,
+            "latitude": 36.9452102,
+            "longitude": 122.0668051,
+            "coverage_percentage": 0.1201876,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02146.JPG",
+            "image_id": 444543,
+            "latitude": 36.945333,
+            "longitude": 122.0671153,
+            "coverage_percentage": 0.2103614,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02147.JPG",
+            "image_id": 444544,
+            "latitude": 36.9454618,
+            "longitude": 122.067422,
+            "coverage_percentage": 0.005235,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02148.JPG",
+            "image_id": 444545,
+            "latitude": 36.9455898,
+            "longitude": 122.0677344,
+            "coverage_percentage": 0.0225974,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02149.JPG",
+            "image_id": 444546,
+            "latitude": 36.9457127,
+            "longitude": 122.0680338,
+            "coverage_percentage": 0.0041539,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02150.JPG",
+            "image_id": 444547,
+            "latitude": 36.9458352,
+            "longitude": 122.0683391,
+            "coverage_percentage": 0.0068354,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02151.JPG",
+            "image_id": 444548,
+            "latitude": 36.9459598,
+            "longitude": 122.0686438,
+            "coverage_percentage": 0.0028214,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02152.JPG",
+            "image_id": 444549,
+            "latitude": 36.9460851,
+            "longitude": 122.068944,
+            "coverage_percentage": 0.4416772,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02153.JPG",
+            "image_id": 444550,
+            "latitude": 36.946212,
+            "longitude": 122.0692494,
+            "coverage_percentage": 2.2147758,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02154.JPG",
+            "image_id": 444551,
+            "latitude": 36.9463382,
+            "longitude": 122.0695463,
+            "coverage_percentage": 6.8758941,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02155.JPG",
+            "image_id": 444552,
+            "latitude": 36.9464658,
+            "longitude": 122.0698516,
+            "coverage_percentage": 8.7516499,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02156.JPG",
+            "image_id": 444553,
+            "latitude": 36.9465854,
+            "longitude": 122.0701594,
+            "coverage_percentage": 10.1985693,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02157.JPG",
+            "image_id": 444554,
+            "latitude": 36.9467054,
+            "longitude": 122.0704683,
+            "coverage_percentage": 22.1854897,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02158.JPG",
+            "image_id": 444555,
+            "latitude": 36.9465714,
+            "longitude": 122.0716909,
+            "coverage_percentage": 1.4748038,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02159.JPG",
+            "image_id": 444556,
+            "latitude": 36.9465136,
+            "longitude": 122.0713621,
+            "coverage_percentage": 7.8992763,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02160.JPG",
+            "image_id": 444557,
+            "latitude": 36.9464718,
+            "longitude": 122.0710269,
+            "coverage_percentage": 19.8978825,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02161.JPG",
+            "image_id": 444558,
+            "latitude": 36.9463815,
+            "longitude": 122.0707037,
+            "coverage_percentage": 19.2209663,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02162.JPG",
+            "image_id": 444559,
+            "latitude": 36.9462486,
+            "longitude": 122.0704047,
+            "coverage_percentage": 4.6170144,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02163.JPG",
+            "image_id": 444560,
+            "latitude": 36.9461014,
+            "longitude": 122.0701096,
+            "coverage_percentage": 1.2689092,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02164.JPG",
+            "image_id": 444561,
+            "latitude": 36.9459652,
+            "longitude": 122.0698111,
+            "coverage_percentage": 1.175409,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02165.JPG",
+            "image_id": 444562,
+            "latitude": 36.9458431,
+            "longitude": 122.0694981,
+            "coverage_percentage": 0.3275213,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02166.JPG",
+            "image_id": 444563,
+            "latitude": 36.9457237,
+            "longitude": 122.0691788,
+            "coverage_percentage": 5.45e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02167.JPG",
+            "image_id": 444564,
+            "latitude": 36.9456005,
+            "longitude": 122.0688676,
+            "coverage_percentage": 0.0001304,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02168.JPG",
+            "image_id": 444565,
+            "latitude": 36.9454706,
+            "longitude": 122.0685622,
+            "coverage_percentage": 1.66e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02169.JPG",
+            "image_id": 444566,
+            "latitude": 36.945338,
+            "longitude": 122.0682613,
+            "coverage_percentage": 7.1e-06,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02170.JPG",
+            "image_id": 444567,
+            "latitude": 36.9452139,
+            "longitude": 122.0679538,
+            "coverage_percentage": 8.3e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02171.JPG",
+            "image_id": 444568,
+            "latitude": 36.9450929,
+            "longitude": 122.0676425,
+            "coverage_percentage": 0.0008132,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02172.JPG",
+            "image_id": 444569,
+            "latitude": 36.9449688,
+            "longitude": 122.0673341,
+            "coverage_percentage": 0.000754,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02173.JPG",
+            "image_id": 444570,
+            "latitude": 36.9448396,
+            "longitude": 122.0670277,
+            "coverage_percentage": 0.0023259,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02174.JPG",
+            "image_id": 444571,
+            "latitude": 36.9447103,
+            "longitude": 122.0667239,
+            "coverage_percentage": 0.0008227,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02175.JPG",
+            "image_id": 444572,
+            "latitude": 36.944585,
+            "longitude": 122.066415,
+            "coverage_percentage": 0.0086207,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02176.JPG",
+            "image_id": 444573,
+            "latitude": 36.9444652,
+            "longitude": 122.0661122,
+            "coverage_percentage": 0.0026507,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02177.JPG",
+            "image_id": 444574,
+            "latitude": 36.9443385,
+            "longitude": 122.0658056,
+            "coverage_percentage": 0.0005003,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02178.JPG",
+            "image_id": 444575,
+            "latitude": 36.9442134,
+            "longitude": 122.0655038,
+            "coverage_percentage": 0.0006899,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02179.JPG",
+            "image_id": 444576,
+            "latitude": 36.9440875,
+            "longitude": 122.0651949,
+            "coverage_percentage": 0.0003106,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02180.JPG",
+            "image_id": 444577,
+            "latitude": 36.9439644,
+            "longitude": 122.0648908,
+            "coverage_percentage": 0.0006781,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02181.JPG",
+            "image_id": 444578,
+            "latitude": 36.9438385,
+            "longitude": 122.0645879,
+            "coverage_percentage": 0.8935945,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02182.JPG",
+            "image_id": 444579,
+            "latitude": 36.9437123,
+            "longitude": 122.0642846,
+            "coverage_percentage": 0.0004291,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02183.JPG",
+            "image_id": 444580,
+            "latitude": 36.9435871,
+            "longitude": 122.0639763,
+            "coverage_percentage": 0.0011475,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02184.JPG",
+            "image_id": 444581,
+            "latitude": 36.9434641,
+            "longitude": 122.063667,
+            "coverage_percentage": 0.000192,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02185.JPG",
+            "image_id": 444582,
+            "latitude": 36.9433426,
+            "longitude": 122.063367,
+            "coverage_percentage": 0.0002821,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02186.JPG",
+            "image_id": 444583,
+            "latitude": 36.9432161,
+            "longitude": 122.0630596,
+            "coverage_percentage": 1.42e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02187.JPG",
+            "image_id": 444584,
+            "latitude": 36.943087,
+            "longitude": 122.062745,
+            "coverage_percentage": 0.0004457,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02188.JPG",
+            "image_id": 444585,
+            "latitude": 36.9429602,
+            "longitude": 122.0624412,
+            "coverage_percentage": 0.0009294,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02189.JPG",
+            "image_id": 444586,
+            "latitude": 36.9428353,
+            "longitude": 122.0621283,
+            "coverage_percentage": 0.0002893,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02190.JPG",
+            "image_id": 444587,
+            "latitude": 36.9427112,
+            "longitude": 122.0618223,
+            "coverage_percentage": 0.0009436,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02191.JPG",
+            "image_id": 444588,
+            "latitude": 36.9425848,
+            "longitude": 122.0615181,
+            "coverage_percentage": 0.0031747,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02192.JPG",
+            "image_id": 444589,
+            "latitude": 36.9423251,
+            "longitude": 122.0619913,
+            "coverage_percentage": 0.0044645,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02193.JPG",
+            "image_id": 444590,
+            "latitude": 36.9424797,
+            "longitude": 122.0622788,
+            "coverage_percentage": 0.0038836,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02194.JPG",
+            "image_id": 444591,
+            "latitude": 36.9425907,
+            "longitude": 122.0625926,
+            "coverage_percentage": 0.0416171,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02195.JPG",
+            "image_id": 444592,
+            "latitude": 36.9426885,
+            "longitude": 122.0629155,
+            "coverage_percentage": 0.0073072,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02196.JPG",
+            "image_id": 444593,
+            "latitude": 36.9427997,
+            "longitude": 122.0632284,
+            "coverage_percentage": 0.0042084,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02197.JPG",
+            "image_id": 444594,
+            "latitude": 36.9429295,
+            "longitude": 122.063532,
+            "coverage_percentage": 0.0084002,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02198.JPG",
+            "image_id": 444595,
+            "latitude": 36.9430643,
+            "longitude": 122.0638316,
+            "coverage_percentage": 0.034822,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02199.JPG",
+            "image_id": 444596,
+            "latitude": 36.9431973,
+            "longitude": 122.0641395,
+            "coverage_percentage": 0.0018138,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02200.JPG",
+            "image_id": 444597,
+            "latitude": 36.9433197,
+            "longitude": 122.0644439,
+            "coverage_percentage": 0.0765173,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02201.JPG",
+            "image_id": 444598,
+            "latitude": 36.9434418,
+            "longitude": 122.0647578,
+            "coverage_percentage": 0.0345683,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02202.JPG",
+            "image_id": 444599,
+            "latitude": 36.9435597,
+            "longitude": 122.0650652,
+            "coverage_percentage": 0.015596,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02203.JPG",
+            "image_id": 444600,
+            "latitude": 36.9436899,
+            "longitude": 122.0653721,
+            "coverage_percentage": 0.2520472,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02204.JPG",
+            "image_id": 444601,
+            "latitude": 36.943822,
+            "longitude": 122.0656785,
+            "coverage_percentage": 0.001726,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02205.JPG",
+            "image_id": 444602,
+            "latitude": 36.9439476,
+            "longitude": 122.0659818,
+            "coverage_percentage": 0.0012779,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02206.JPG",
+            "image_id": 444603,
+            "latitude": 36.9440696,
+            "longitude": 122.0662909,
+            "coverage_percentage": 0.0092395,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02207.JPG",
+            "image_id": 444604,
+            "latitude": 36.9441908,
+            "longitude": 122.066607,
+            "coverage_percentage": 0.0091163,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02208.JPG",
+            "image_id": 444605,
+            "latitude": 36.9443166,
+            "longitude": 122.0669151,
+            "coverage_percentage": 0.0291839,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02209.JPG",
+            "image_id": 444606,
+            "latitude": 36.9444467,
+            "longitude": 122.0672212,
+            "coverage_percentage": 0.002793,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02210.JPG",
+            "image_id": 444607,
+            "latitude": 36.9445764,
+            "longitude": 122.0675297,
+            "coverage_percentage": 0.0010219,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02211.JPG",
+            "image_id": 444608,
+            "latitude": 36.944703,
+            "longitude": 122.0678399,
+            "coverage_percentage": 0.0111956,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02212.JPG",
+            "image_id": 444609,
+            "latitude": 36.9448259,
+            "longitude": 122.0681494,
+            "coverage_percentage": 0.0009911,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02213.JPG",
+            "image_id": 444610,
+            "latitude": 36.944949,
+            "longitude": 122.0684535,
+            "coverage_percentage": 0.1060022,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02214.JPG",
+            "image_id": 444611,
+            "latitude": 36.9450751,
+            "longitude": 122.0687586,
+            "coverage_percentage": 0.0608501,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02215.JPG",
+            "image_id": 444612,
+            "latitude": 36.9452018,
+            "longitude": 122.0690635,
+            "coverage_percentage": 0.1303067,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02216.JPG",
+            "image_id": 444613,
+            "latitude": 36.94533,
+            "longitude": 122.0693725,
+            "coverage_percentage": 0.0084168,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02217.JPG",
+            "image_id": 444614,
+            "latitude": 36.9454545,
+            "longitude": 122.0696745,
+            "coverage_percentage": 0.0019086,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02218.JPG",
+            "image_id": 444615,
+            "latitude": 36.9455811,
+            "longitude": 122.069979,
+            "coverage_percentage": 0.0037058,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02219.JPG",
+            "image_id": 444616,
+            "latitude": 36.9457039,
+            "longitude": 122.0702851,
+            "coverage_percentage": 0.0109727,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02220.JPG",
+            "image_id": 444617,
+            "latitude": 36.9458256,
+            "longitude": 122.07059,
+            "coverage_percentage": 0.023982,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02221.JPG",
+            "image_id": 444618,
+            "latitude": 36.9459512,
+            "longitude": 122.0708986,
+            "coverage_percentage": 0.7730988,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02222.JPG",
+            "image_id": 444619,
+            "latitude": 36.9460755,
+            "longitude": 122.0711983,
+            "coverage_percentage": 2.7390683,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02223.JPG",
+            "image_id": 444620,
+            "latitude": 36.9462028,
+            "longitude": 122.0715015,
+            "coverage_percentage": 4.6578727,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02224.JPG",
+            "image_id": 444621,
+            "latitude": 36.9463297,
+            "longitude": 122.0718043,
+            "coverage_percentage": 3.1538899,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02225.JPG",
+            "image_id": 444622,
+            "latitude": 36.946453,
+            "longitude": 122.0721138,
+            "coverage_percentage": 4.5948582,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02226.JPG",
+            "image_id": 444623,
+            "latitude": 36.9465765,
+            "longitude": 122.0724234,
+            "coverage_percentage": 6.6176519,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02227.JPG",
+            "image_id": 444624,
+            "latitude": 36.9467021,
+            "longitude": 122.0727298,
+            "coverage_percentage": 6.1895838,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02228.JPG",
+            "image_id": 444625,
+            "latitude": 36.9466481,
+            "longitude": 122.0741651,
+            "coverage_percentage": 0.1030481,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02229.JPG",
+            "image_id": 444626,
+            "latitude": 36.9466026,
+            "longitude": 122.0738298,
+            "coverage_percentage": 0.0004457,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02230.JPG",
+            "image_id": 444627,
+            "latitude": 36.9465631,
+            "longitude": 122.0734916,
+            "coverage_percentage": 1.6221529,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02231.JPG",
+            "image_id": 444628,
+            "latitude": 36.9464628,
+            "longitude": 122.0731711,
+            "coverage_percentage": 1.2480142,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02232.JPG",
+            "image_id": 444629,
+            "latitude": 36.94632,
+            "longitude": 122.0728788,
+            "coverage_percentage": 0.008782,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02233.JPG",
+            "image_id": 444630,
+            "latitude": 36.9461722,
+            "longitude": 122.0725844,
+            "coverage_percentage": 0.0251319,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02234.JPG",
+            "image_id": 444631,
+            "latitude": 36.9460469,
+            "longitude": 122.0722798,
+            "coverage_percentage": 0.0006615,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC01995.JPG",
+            "image_id": 444392,
+            "latitude": 36.9462958,
+            "longitude": 122.0639235,
+            "coverage_percentage": 11.4919722,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02235.JPG",
+            "image_id": 444632,
+            "latitude": 36.9459258,
+            "longitude": 122.0719647,
+            "coverage_percentage": 0.586532,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02236.JPG",
+            "image_id": 444633,
+            "latitude": 36.9458031,
+            "longitude": 122.071656,
+            "coverage_percentage": 0.8769719,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02237.JPG",
+            "image_id": 444634,
+            "latitude": 36.9456719,
+            "longitude": 122.0713498,
+            "coverage_percentage": 0.0015411,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02238.JPG",
+            "image_id": 444635,
+            "latitude": 36.9455468,
+            "longitude": 122.0710417,
+            "coverage_percentage": 0.0003936,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02239.JPG",
+            "image_id": 444636,
+            "latitude": 36.9454261,
+            "longitude": 122.0707331,
+            "coverage_percentage": 0.0006852,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02240.JPG",
+            "image_id": 444637,
+            "latitude": 36.9452964,
+            "longitude": 122.0704246,
+            "coverage_percentage": 0.0008061,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02241.JPG",
+            "image_id": 444638,
+            "latitude": 36.9451632,
+            "longitude": 122.0701137,
+            "coverage_percentage": 0.0003177,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02242.JPG",
+            "image_id": 444639,
+            "latitude": 36.9450328,
+            "longitude": 122.0698065,
+            "coverage_percentage": 0.0025393,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02243.JPG",
+            "image_id": 444640,
+            "latitude": 36.9449104,
+            "longitude": 122.069493,
+            "coverage_percentage": 0.0008037,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02244.JPG",
+            "image_id": 444641,
+            "latitude": 36.9447919,
+            "longitude": 122.0691786,
+            "coverage_percentage": 0.0005643,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02245.JPG",
+            "image_id": 444642,
+            "latitude": 36.9446675,
+            "longitude": 122.0688761,
+            "coverage_percentage": 0.0019205,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02246.JPG",
+            "image_id": 444643,
+            "latitude": 36.9445398,
+            "longitude": 122.0685695,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02247.JPG",
+            "image_id": 444644,
+            "latitude": 36.9444136,
+            "longitude": 122.0682707,
+            "coverage_percentage": 0.000607,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02248.JPG",
+            "image_id": 444645,
+            "latitude": 36.9442843,
+            "longitude": 122.067967,
+            "coverage_percentage": 0.000192,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02249.JPG",
+            "image_id": 444646,
+            "latitude": 36.9441593,
+            "longitude": 122.0676621,
+            "coverage_percentage": 0.0005026,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02250.JPG",
+            "image_id": 444647,
+            "latitude": 36.9440372,
+            "longitude": 122.0673539,
+            "coverage_percentage": 0.0004244,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02251.JPG",
+            "image_id": 444648,
+            "latitude": 36.9439139,
+            "longitude": 122.0670456,
+            "coverage_percentage": 0.0008844,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02252.JPG",
+            "image_id": 444649,
+            "latitude": 36.9437883,
+            "longitude": 122.0667373,
+            "coverage_percentage": 0.0002916,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02253.JPG",
+            "image_id": 444650,
+            "latitude": 36.9436621,
+            "longitude": 122.0664329,
+            "coverage_percentage": 0.0004054,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02254.JPG",
+            "image_id": 444651,
+            "latitude": 36.9435368,
+            "longitude": 122.0661345,
+            "coverage_percentage": 0.0016099,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02255.JPG",
+            "image_id": 444652,
+            "latitude": 36.9434107,
+            "longitude": 122.0658324,
+            "coverage_percentage": 0.0680838,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02256.JPG",
+            "image_id": 444653,
+            "latitude": 36.943286,
+            "longitude": 122.0655272,
+            "coverage_percentage": 0.0003011,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02257.JPG",
+            "image_id": 444654,
+            "latitude": 36.9431651,
+            "longitude": 122.0652204,
+            "coverage_percentage": 0.0001185,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02258.JPG",
+            "image_id": 444655,
+            "latitude": 36.9430403,
+            "longitude": 122.0649068,
+            "coverage_percentage": 0.0014226,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02259.JPG",
+            "image_id": 444656,
+            "latitude": 36.9429127,
+            "longitude": 122.0646001,
+            "coverage_percentage": 0.0001446,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02260.JPG",
+            "image_id": 444657,
+            "latitude": 36.9427893,
+            "longitude": 122.0642929,
+            "coverage_percentage": 8.3e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02261.JPG",
+            "image_id": 444658,
+            "latitude": 36.942665,
+            "longitude": 122.0639819,
+            "coverage_percentage": 0.0280624,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02262.JPG",
+            "image_id": 444659,
+            "latitude": 36.9425372,
+            "longitude": 122.0636767,
+            "coverage_percentage": 0.0004268,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02263.JPG",
+            "image_id": 444660,
+            "latitude": 36.9424083,
+            "longitude": 122.0633731,
+            "coverage_percentage": 0.0004339,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02264.JPG",
+            "image_id": 444661,
+            "latitude": 36.9422838,
+            "longitude": 122.0630684,
+            "coverage_percentage": 6.88e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02265.JPG",
+            "image_id": 444662,
+            "latitude": 36.9421612,
+            "longitude": 122.0627619,
+            "coverage_percentage": 0.0004884,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02266.JPG",
+            "image_id": 444663,
+            "latitude": 36.9419272,
+            "longitude": 122.0633121,
+            "coverage_percentage": 0.005107,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02267.JPG",
+            "image_id": 444664,
+            "latitude": 36.9420822,
+            "longitude": 122.0636029,
+            "coverage_percentage": 0.0619336,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02268.JPG",
+            "image_id": 444665,
+            "latitude": 36.942194,
+            "longitude": 122.0639162,
+            "coverage_percentage": 0.0263269,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02269.JPG",
+            "image_id": 444666,
+            "latitude": 36.9422982,
+            "longitude": 122.0642409,
+            "coverage_percentage": 0.0746679,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02270.JPG",
+            "image_id": 444667,
+            "latitude": 36.9424118,
+            "longitude": 122.0645545,
+            "coverage_percentage": 0.0112833,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02271.JPG",
+            "image_id": 444668,
+            "latitude": 36.9425395,
+            "longitude": 122.0648621,
+            "coverage_percentage": 0.0279059,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02272.JPG",
+            "image_id": 444669,
+            "latitude": 36.9426733,
+            "longitude": 122.0651582,
+            "coverage_percentage": 0.0009128,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02273.JPG",
+            "image_id": 444670,
+            "latitude": 36.9428062,
+            "longitude": 122.0654648,
+            "coverage_percentage": 0.00147,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02274.JPG",
+            "image_id": 444671,
+            "latitude": 36.9429272,
+            "longitude": 122.0657719,
+            "coverage_percentage": 0.1746219,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02275.JPG",
+            "image_id": 444672,
+            "latitude": 36.9430443,
+            "longitude": 122.0660833,
+            "coverage_percentage": 0.1046247,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02276.JPG",
+            "image_id": 444673,
+            "latitude": 36.9431715,
+            "longitude": 122.0663951,
+            "coverage_percentage": 7.35e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02277.JPG",
+            "image_id": 444674,
+            "latitude": 36.9432972,
+            "longitude": 122.0667004,
+            "coverage_percentage": 0.001828,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02278.JPG",
+            "image_id": 444675,
+            "latitude": 36.9434249,
+            "longitude": 122.0670047,
+            "coverage_percentage": 0.0007231,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02279.JPG",
+            "image_id": 444676,
+            "latitude": 36.9435512,
+            "longitude": 122.0673086,
+            "coverage_percentage": 1.42e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02280.JPG",
+            "image_id": 444677,
+            "latitude": 36.9436811,
+            "longitude": 122.0676172,
+            "coverage_percentage": 0.001553,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02281.JPG",
+            "image_id": 444678,
+            "latitude": 36.9438097,
+            "longitude": 122.0679171,
+            "coverage_percentage": 0.0006449,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02282.JPG",
+            "image_id": 444679,
+            "latitude": 36.9439336,
+            "longitude": 122.0682317,
+            "coverage_percentage": 0.0005572,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02283.JPG",
+            "image_id": 444680,
+            "latitude": 36.9440564,
+            "longitude": 122.0685443,
+            "coverage_percentage": 0.0706824,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02284.JPG",
+            "image_id": 444681,
+            "latitude": 36.9441756,
+            "longitude": 122.0688505,
+            "coverage_percentage": 0.0003675,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02285.JPG",
+            "image_id": 444682,
+            "latitude": 36.9442977,
+            "longitude": 122.0691579,
+            "coverage_percentage": 0.0001517,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02286.JPG",
+            "image_id": 444683,
+            "latitude": 36.9444248,
+            "longitude": 122.0694683,
+            "coverage_percentage": 0.0003651,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02287.JPG",
+            "image_id": 444684,
+            "latitude": 36.9445536,
+            "longitude": 122.0697726,
+            "coverage_percentage": 7.11e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02288.JPG",
+            "image_id": 444685,
+            "latitude": 36.9446834,
+            "longitude": 122.0700789,
+            "coverage_percentage": 0.0108494,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02289.JPG",
+            "image_id": 444686,
+            "latitude": 36.9448093,
+            "longitude": 122.0703854,
+            "coverage_percentage": 0.0025298,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02290.JPG",
+            "image_id": 444687,
+            "latitude": 36.9449359,
+            "longitude": 122.0706912,
+            "coverage_percentage": 0.0008607,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02291.JPG",
+            "image_id": 444688,
+            "latitude": 36.9450608,
+            "longitude": 122.0710025,
+            "coverage_percentage": 0.0047039,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02292.JPG",
+            "image_id": 444689,
+            "latitude": 36.9451853,
+            "longitude": 122.071318,
+            "coverage_percentage": 0.001579,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02293.JPG",
+            "image_id": 444690,
+            "latitude": 36.9453088,
+            "longitude": 122.0716265,
+            "coverage_percentage": 0.0175805,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02294.JPG",
+            "image_id": 444691,
+            "latitude": 36.9454361,
+            "longitude": 122.0719323,
+            "coverage_percentage": 0.0038955,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02295.JPG",
+            "image_id": 444692,
+            "latitude": 36.9455627,
+            "longitude": 122.0722389,
+            "coverage_percentage": 5.93e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02296.JPG",
+            "image_id": 444693,
+            "latitude": 36.9456873,
+            "longitude": 122.0725415,
+            "coverage_percentage": 0.0011357,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02297.JPG",
+            "image_id": 444694,
+            "latitude": 36.9458148,
+            "longitude": 122.0728468,
+            "coverage_percentage": 0.0001233,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02298.JPG",
+            "image_id": 444695,
+            "latitude": 36.9459397,
+            "longitude": 122.0731436,
+            "coverage_percentage": 0.0004884,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02299.JPG",
+            "image_id": 444696,
+            "latitude": 36.9460651,
+            "longitude": 122.0734545,
+            "coverage_percentage": 0.006916,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02300.JPG",
+            "image_id": 444697,
+            "latitude": 36.9461856,
+            "longitude": 122.0737598,
+            "coverage_percentage": 0.0235434,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02301.JPG",
+            "image_id": 444698,
+            "latitude": 36.946308,
+            "longitude": 122.074066,
+            "coverage_percentage": 0.0117527,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02302.JPG",
+            "image_id": 444699,
+            "latitude": 36.9464374,
+            "longitude": 122.0743719,
+            "coverage_percentage": 0.0030277,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02303.JPG",
+            "image_id": 444700,
+            "latitude": 36.945942,
+            "longitude": 122.0742311,
+            "coverage_percentage": 0.0043625,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02304.JPG",
+            "image_id": 444701,
+            "latitude": 36.9458302,
+            "longitude": 122.0739146,
+            "coverage_percentage": 0.0049861,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02305.JPG",
+            "image_id": 444702,
+            "latitude": 36.9456863,
+            "longitude": 122.0736186,
+            "coverage_percentage": 9.5e-06,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02306.JPG",
+            "image_id": 444703,
+            "latitude": 36.9455383,
+            "longitude": 122.0733212,
+            "coverage_percentage": 1.19e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02307.JPG",
+            "image_id": 444704,
+            "latitude": 36.9454103,
+            "longitude": 122.0730217,
+            "coverage_percentage": 0.0016573,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02308.JPG",
+            "image_id": 444705,
+            "latitude": 36.9452868,
+            "longitude": 122.0727076,
+            "coverage_percentage": 0.0378781,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02309.JPG",
+            "image_id": 444706,
+            "latitude": 36.9451673,
+            "longitude": 122.0723985,
+            "coverage_percentage": 0.0114777,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02310.JPG",
+            "image_id": 444707,
+            "latitude": 36.9450445,
+            "longitude": 122.0720867,
+            "coverage_percentage": 0.0003343,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02311.JPG",
+            "image_id": 444708,
+            "latitude": 36.9449182,
+            "longitude": 122.0717812,
+            "coverage_percentage": 0.0349429,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02312.JPG",
+            "image_id": 444709,
+            "latitude": 36.9447869,
+            "longitude": 122.0714794,
+            "coverage_percentage": 0.0663033,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02313.JPG",
+            "image_id": 444710,
+            "latitude": 36.9446589,
+            "longitude": 122.0711792,
+            "coverage_percentage": 0.0001114,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02314.JPG",
+            "image_id": 444711,
+            "latitude": 36.9445348,
+            "longitude": 122.0708679,
+            "coverage_percentage": 0.0001992,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02315.JPG",
+            "image_id": 444712,
+            "latitude": 36.9444145,
+            "longitude": 122.0705568,
+            "coverage_percentage": 0.0002845,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02316.JPG",
+            "image_id": 444713,
+            "latitude": 36.9442909,
+            "longitude": 122.0702484,
+            "coverage_percentage": 0.0005169,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02317.JPG",
+            "image_id": 444714,
+            "latitude": 36.9441617,
+            "longitude": 122.0699376,
+            "coverage_percentage": 0.025554,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02318.JPG",
+            "image_id": 444715,
+            "latitude": 36.9440352,
+            "longitude": 122.0696361,
+            "coverage_percentage": 8.06e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02319.JPG",
+            "image_id": 444716,
+            "latitude": 36.9439099,
+            "longitude": 122.0693335,
+            "coverage_percentage": 0.8051372,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02320.JPG",
+            "image_id": 444717,
+            "latitude": 36.943786,
+            "longitude": 122.0690262,
+            "coverage_percentage": 0.0054366,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02321.JPG",
+            "image_id": 444718,
+            "latitude": 36.9436623,
+            "longitude": 122.0687154,
+            "coverage_percentage": 0.0002205,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02322.JPG",
+            "image_id": 444719,
+            "latitude": 36.9435368,
+            "longitude": 122.0684155,
+            "coverage_percentage": 0.0002229,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02323.JPG",
+            "image_id": 444720,
+            "latitude": 36.9434099,
+            "longitude": 122.0681074,
+            "coverage_percentage": 0.0003509,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02324.JPG",
+            "image_id": 444721,
+            "latitude": 36.943286,
+            "longitude": 122.0677984,
+            "coverage_percentage": 0.0001636,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02325.JPG",
+            "image_id": 444722,
+            "latitude": 36.943162,
+            "longitude": 122.0674892,
+            "coverage_percentage": 0.0015316,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02326.JPG",
+            "image_id": 444723,
+            "latitude": 36.9430387,
+            "longitude": 122.0671805,
+            "coverage_percentage": 0.0002371,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02327.JPG",
+            "image_id": 444724,
+            "latitude": 36.942913,
+            "longitude": 122.0668715,
+            "coverage_percentage": 0.0002347,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02328.JPG",
+            "image_id": 444725,
+            "latitude": 36.9427808,
+            "longitude": 122.0665699,
+            "coverage_percentage": 9.48e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02329.JPG",
+            "image_id": 444726,
+            "latitude": 36.942654,
+            "longitude": 122.0662709,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02330.JPG",
+            "image_id": 444727,
+            "latitude": 36.9425312,
+            "longitude": 122.0659635,
+            "coverage_percentage": 1.9e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02331.JPG",
+            "image_id": 444728,
+            "latitude": 36.9424097,
+            "longitude": 122.0656596,
+            "coverage_percentage": 0.0004102,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02332.JPG",
+            "image_id": 444729,
+            "latitude": 36.942289,
+            "longitude": 122.0653565,
+            "coverage_percentage": 1.66e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02333.JPG",
+            "image_id": 444730,
+            "latitude": 36.9421634,
+            "longitude": 122.0650485,
+            "coverage_percentage": 0.0001209,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02334.JPG",
+            "image_id": 444731,
+            "latitude": 36.9420369,
+            "longitude": 122.0647454,
+            "coverage_percentage": 0.0001589,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02335.JPG",
+            "image_id": 444732,
+            "latitude": 36.9419107,
+            "longitude": 122.0644404,
+            "coverage_percentage": 0.0028119,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02336.JPG",
+            "image_id": 444733,
+            "latitude": 36.9417876,
+            "longitude": 122.0641287,
+            "coverage_percentage": 0.0002869,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02337.JPG",
+            "image_id": 444734,
+            "latitude": 36.9415223,
+            "longitude": 122.0646367,
+            "coverage_percentage": 0.0006567,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02338.JPG",
+            "image_id": 444735,
+            "latitude": 36.9416841,
+            "longitude": 122.0649086,
+            "coverage_percentage": 0.0018185,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02339.JPG",
+            "image_id": 444736,
+            "latitude": 36.9417987,
+            "longitude": 122.0652205,
+            "coverage_percentage": 0.0011878,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02340.JPG",
+            "image_id": 444737,
+            "latitude": 36.9418977,
+            "longitude": 122.0655438,
+            "coverage_percentage": 0.0374845,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02341.JPG",
+            "image_id": 444738,
+            "latitude": 36.942011,
+            "longitude": 122.0658596,
+            "coverage_percentage": 9.5e-06,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02342.JPG",
+            "image_id": 444739,
+            "latitude": 36.9421394,
+            "longitude": 122.0661579,
+            "coverage_percentage": 0.0078929,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02343.JPG",
+            "image_id": 444740,
+            "latitude": 36.9422727,
+            "longitude": 122.0664535,
+            "coverage_percentage": 0.0009152,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02344.JPG",
+            "image_id": 444741,
+            "latitude": 36.9424015,
+            "longitude": 122.0667595,
+            "coverage_percentage": 0.0055764,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02345.JPG",
+            "image_id": 444742,
+            "latitude": 36.9425229,
+            "longitude": 122.0670667,
+            "coverage_percentage": 0.0125043,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02346.JPG",
+            "image_id": 444743,
+            "latitude": 36.9426441,
+            "longitude": 122.0673779,
+            "coverage_percentage": 0.517092,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02347.JPG",
+            "image_id": 444744,
+            "latitude": 36.9427658,
+            "longitude": 122.0676847,
+            "coverage_percentage": 0.0699189,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02348.JPG",
+            "image_id": 444745,
+            "latitude": 36.9428911,
+            "longitude": 122.0679893,
+            "coverage_percentage": 0.0095667,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02349.JPG",
+            "image_id": 444746,
+            "latitude": 36.9430173,
+            "longitude": 122.0682961,
+            "coverage_percentage": 0.0012424,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02350.JPG",
+            "image_id": 444747,
+            "latitude": 36.9431466,
+            "longitude": 122.0686009,
+            "coverage_percentage": 0.0010574,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02351.JPG",
+            "image_id": 444748,
+            "latitude": 36.9432723,
+            "longitude": 122.0689052,
+            "coverage_percentage": 0.001368,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02352.JPG",
+            "image_id": 444749,
+            "latitude": 36.9433969,
+            "longitude": 122.0692203,
+            "coverage_percentage": 0.2278945,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02353.JPG",
+            "image_id": 444750,
+            "latitude": 36.9435198,
+            "longitude": 122.0695245,
+            "coverage_percentage": 0.0381602,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02354.JPG",
+            "image_id": 444751,
+            "latitude": 36.9436471,
+            "longitude": 122.069831,
+            "coverage_percentage": 0.0033904,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02355.JPG",
+            "image_id": 444752,
+            "latitude": 36.9437734,
+            "longitude": 122.0701347,
+            "coverage_percentage": 0.0105199,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02356.JPG",
+            "image_id": 444753,
+            "latitude": 36.943899,
+            "longitude": 122.0704424,
+            "coverage_percentage": 0.0012329,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02357.JPG",
+            "image_id": 444754,
+            "latitude": 36.9440244,
+            "longitude": 122.0707527,
+            "coverage_percentage": 0.0002442,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02358.JPG",
+            "image_id": 444755,
+            "latitude": 36.9441518,
+            "longitude": 122.0710595,
+            "coverage_percentage": 0.0005311,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02359.JPG",
+            "image_id": 444756,
+            "latitude": 36.9442768,
+            "longitude": 122.0713666,
+            "coverage_percentage": 0.0057756,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02360.JPG",
+            "image_id": 444757,
+            "latitude": 36.9444006,
+            "longitude": 122.0716736,
+            "coverage_percentage": 0.0217391,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02361.JPG",
+            "image_id": 444758,
+            "latitude": 36.9445249,
+            "longitude": 122.0719847,
+            "coverage_percentage": 0.0002347,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02362.JPG",
+            "image_id": 444759,
+            "latitude": 36.944649,
+            "longitude": 122.0722921,
+            "coverage_percentage": 0.0006283,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02363.JPG",
+            "image_id": 444760,
+            "latitude": 36.9447783,
+            "longitude": 122.0726022,
+            "coverage_percentage": 0.0092064,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02364.JPG",
+            "image_id": 444761,
+            "latitude": 36.9449026,
+            "longitude": 122.0729187,
+            "coverage_percentage": 0.000716,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02365.JPG",
+            "image_id": 444762,
+            "latitude": 36.9450274,
+            "longitude": 122.073228,
+            "coverage_percentage": 0.0094553,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02366.JPG",
+            "image_id": 444763,
+            "latitude": 36.9451567,
+            "longitude": 122.0735292,
+            "coverage_percentage": 0.0006805,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02367.JPG",
+            "image_id": 444764,
+            "latitude": 36.9452856,
+            "longitude": 122.0738262,
+            "coverage_percentage": 0.000128,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02368.JPG",
+            "image_id": 444765,
+            "latitude": 36.9447378,
+            "longitude": 122.0735235,
+            "coverage_percentage": 0.0581188,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02369.JPG",
+            "image_id": 444766,
+            "latitude": 36.9446065,
+            "longitude": 122.0732184,
+            "coverage_percentage": 0.629766,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02370.JPG",
+            "image_id": 444767,
+            "latitude": 36.9444588,
+            "longitude": 122.0729285,
+            "coverage_percentage": 0.0238848,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02371.JPG",
+            "image_id": 444768,
+            "latitude": 36.9443205,
+            "longitude": 122.0726324,
+            "coverage_percentage": 0.0030372,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02372.JPG",
+            "image_id": 444769,
+            "latitude": 36.9441978,
+            "longitude": 122.0723284,
+            "coverage_percentage": 0.0001968,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02373.JPG",
+            "image_id": 444770,
+            "latitude": 36.9440784,
+            "longitude": 122.0720132,
+            "coverage_percentage": 0.1275517,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02374.JPG",
+            "image_id": 444771,
+            "latitude": 36.9439569,
+            "longitude": 122.0717076,
+            "coverage_percentage": 0.0004837,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02375.JPG",
+            "image_id": 444772,
+            "latitude": 36.9438305,
+            "longitude": 122.071401,
+            "coverage_percentage": 0.522135,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02376.JPG",
+            "image_id": 444773,
+            "latitude": 36.943702,
+            "longitude": 122.0710867,
+            "coverage_percentage": 4.74e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02377.JPG",
+            "image_id": 444774,
+            "latitude": 36.9435776,
+            "longitude": 122.0707754,
+            "coverage_percentage": 4.7e-06,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02378.JPG",
+            "image_id": 444775,
+            "latitude": 36.9434498,
+            "longitude": 122.070466,
+            "coverage_percentage": 0.0002893,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02379.JPG",
+            "image_id": 444776,
+            "latitude": 36.9433196,
+            "longitude": 122.070161,
+            "coverage_percentage": 0.4412528,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02380.JPG",
+            "image_id": 444777,
+            "latitude": 36.943195,
+            "longitude": 122.0698541,
+            "coverage_percentage": 0.0001423,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02381.JPG",
+            "image_id": 444778,
+            "latitude": 36.9430718,
+            "longitude": 122.0695431,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02382.JPG",
+            "image_id": 444779,
+            "latitude": 36.9429427,
+            "longitude": 122.0692395,
+            "coverage_percentage": 0.0016668,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02383.JPG",
+            "image_id": 444780,
+            "latitude": 36.942814,
+            "longitude": 122.0689378,
+            "coverage_percentage": 0.002167,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02384.JPG",
+            "image_id": 444781,
+            "latitude": 36.9426923,
+            "longitude": 122.0686378,
+            "coverage_percentage": 0.0007397,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02385.JPG",
+            "image_id": 444782,
+            "latitude": 36.9425715,
+            "longitude": 122.0683333,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02386.JPG",
+            "image_id": 444783,
+            "latitude": 36.942452,
+            "longitude": 122.0680256,
+            "coverage_percentage": 0.0132654,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02387.JPG",
+            "image_id": 444784,
+            "latitude": 36.94233,
+            "longitude": 122.0677174,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02388.JPG",
+            "image_id": 444785,
+            "latitude": 36.9422009,
+            "longitude": 122.0674064,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02389.JPG",
+            "image_id": 444786,
+            "latitude": 36.9420705,
+            "longitude": 122.0671057,
+            "coverage_percentage": 0.9697609,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02390.JPG",
+            "image_id": 444787,
+            "latitude": 36.941943,
+            "longitude": 122.0668021,
+            "coverage_percentage": 2.13e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02391.JPG",
+            "image_id": 444788,
+            "latitude": 36.941815,
+            "longitude": 122.0665015,
+            "coverage_percentage": 0.0003011,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02392.JPG",
+            "image_id": 444789,
+            "latitude": 36.9416897,
+            "longitude": 122.0661994,
+            "coverage_percentage": 0.0020627,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02393.JPG",
+            "image_id": 444790,
+            "latitude": 36.9415717,
+            "longitude": 122.0658901,
+            "coverage_percentage": 0.3932247,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02394.JPG",
+            "image_id": 444791,
+            "latitude": 36.9414511,
+            "longitude": 122.065583,
+            "coverage_percentage": 0.000671,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02395.JPG",
+            "image_id": 444792,
+            "latitude": 36.9413253,
+            "longitude": 122.0652806,
+            "coverage_percentage": 0.0071507,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02396.JPG",
+            "image_id": 444793,
+            "latitude": 36.9411448,
+            "longitude": 122.0659618,
+            "coverage_percentage": 0.0027408,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02397.JPG",
+            "image_id": 444794,
+            "latitude": 36.9412969,
+            "longitude": 122.0662528,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02398.JPG",
+            "image_id": 444795,
+            "latitude": 36.9414074,
+            "longitude": 122.0665641,
+            "coverage_percentage": 0.0028902,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02399.JPG",
+            "image_id": 444796,
+            "latitude": 36.9415098,
+            "longitude": 122.0668854,
+            "coverage_percentage": 0.0013206,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02400.JPG",
+            "image_id": 444797,
+            "latitude": 36.9416279,
+            "longitude": 122.0672052,
+            "coverage_percentage": 0.0041634,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02401.JPG",
+            "image_id": 444798,
+            "latitude": 36.9417545,
+            "longitude": 122.0675125,
+            "coverage_percentage": 0.002857,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02402.JPG",
+            "image_id": 444799,
+            "latitude": 36.9418853,
+            "longitude": 122.0678143,
+            "coverage_percentage": 0.0036963,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02403.JPG",
+            "image_id": 444800,
+            "latitude": 36.9420189,
+            "longitude": 122.0681176,
+            "coverage_percentage": 0.0005145,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02404.JPG",
+            "image_id": 444801,
+            "latitude": 36.9421425,
+            "longitude": 122.0684203,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02405.JPG",
+            "image_id": 444802,
+            "latitude": 36.9422692,
+            "longitude": 122.0687304,
+            "coverage_percentage": 8.06e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02406.JPG",
+            "image_id": 444803,
+            "latitude": 36.9423915,
+            "longitude": 122.0690361,
+            "coverage_percentage": 0.0525945,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02407.JPG",
+            "image_id": 444804,
+            "latitude": 36.942515,
+            "longitude": 122.0693382,
+            "coverage_percentage": 0.0016549,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02408.JPG",
+            "image_id": 444805,
+            "latitude": 36.9426407,
+            "longitude": 122.0696469,
+            "coverage_percentage": 0.0007042,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02409.JPG",
+            "image_id": 444806,
+            "latitude": 36.9427665,
+            "longitude": 122.0699611,
+            "coverage_percentage": 0.0005263,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02410.JPG",
+            "image_id": 444807,
+            "latitude": 36.942889,
+            "longitude": 122.070267,
+            "coverage_percentage": 0.0036892,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02411.JPG",
+            "image_id": 444808,
+            "latitude": 36.943013,
+            "longitude": 122.0705756,
+            "coverage_percentage": 0.0103159,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02412.JPG",
+            "image_id": 444809,
+            "latitude": 36.9431412,
+            "longitude": 122.0708835,
+            "coverage_percentage": 0.0,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02413.JPG",
+            "image_id": 444810,
+            "latitude": 36.9432674,
+            "longitude": 122.0711847,
+            "coverage_percentage": 9.72e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02414.JPG",
+            "image_id": 444811,
+            "latitude": 36.9433936,
+            "longitude": 122.071495,
+            "coverage_percentage": 0.0084998,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02415.JPG",
+            "image_id": 444812,
+            "latitude": 36.943521,
+            "longitude": 122.0717974,
+            "coverage_percentage": 0.0326122,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02416.JPG",
+            "image_id": 444813,
+            "latitude": 36.9436501,
+            "longitude": 122.0720946,
+            "coverage_percentage": 0.0003794,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02417.JPG",
+            "image_id": 444814,
+            "latitude": 36.9437735,
+            "longitude": 122.0724002,
+            "coverage_percentage": 0.1613304,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02418.JPG",
+            "image_id": 444815,
+            "latitude": 36.9438971,
+            "longitude": 122.0727153,
+            "coverage_percentage": 0.0041515,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        },
+        {
+            "image_name": "trinity-2_20250404T173830_Seymour_DSC02419.JPG",
+            "image_id": 444816,
+            "latitude": 36.9440187,
+            "longitude": 122.0730215,
+            "coverage_percentage": 2.37e-05,
+            "param_string": "slice1024_pts3_mobile_hierarchical4096_erosion51_color-val50"
+        }
+    ]
+}

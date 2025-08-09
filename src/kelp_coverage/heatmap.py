@@ -97,7 +97,7 @@ def generate_heatmap(
 
     grid_to_plot.plot(
         column="coverage_percentage",
-        cmap="viridis",
+        cmap="viridis_r",
         ax=ax,
         legend=False,
         edgecolor="black",
