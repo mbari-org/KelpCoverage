@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools >= 77.0.3"]
+requires = ["setuptools >= 77.0.3", "setuptools_scm[toml]>=6.2"]]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "kelp_coverage"
-version = "1.8.0"
+dynamic = ["version"]
 authors = [
 	{name="Tim Sananikone", email="tims3900@gmail.com"},
 ]
