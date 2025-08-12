@@ -387,4 +387,4 @@ class HierarchicalProcessor:
             if self.coarse_pass_water_mask_gpu is not None
             else None
         )
-        return {"Fine Pass": fine_water_mask_np, "Coarse Pass": coarse_water_mask_np}
+        return {"Coarse Pass": coarse_water_mask_np, "Fine Pass": fine_water_mask_np}
