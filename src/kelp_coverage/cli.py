@@ -438,7 +438,6 @@ def main() -> None:
     # Setup Parser
     setup_parser = subparsers.add_parser(
         "setup",
-        parents=[base_parser],
         help="Download images and compute representative water pixel for each site.",
     )
     setup_parser.add_argument(
@@ -468,6 +467,12 @@ def main() -> None:
         "--visualize",
         action="store_true",
         help="Display histograms of the LAB color channels for each site.",
+    )
+    setup_parser.add_argument(
+        "--verbose",
+        type=str,
+        default="tator_data.csv",
+        help="Verbose output.",
     )
 
     # Analysis Parser
