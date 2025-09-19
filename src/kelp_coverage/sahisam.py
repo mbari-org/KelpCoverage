@@ -414,18 +414,21 @@ class SAHISAM:
         return masks
 
     def _manual_batch_predict(
-        self, slices_for_batch: List[np.ndarray], batch_points: List[np.ndarray]
-    ) -> List[torch.Tensor]:
+            self, slices_for_batch: List[np.ndarray], batch_points: List[np.ndarray]
+        ) -> List[torch.Tensor]:
         # implementation based on forward function from SAM model
         # https://github.com/facebookresearch/segment-anything/blob/dca509fe793f601edb92606367a655c15ac00fdf/segment_anything/modeling/sam.py#L130
         if not slices_for_batch:
             return []
         preprocessed_slices = [self.transform.apply_image(s) for s in slices_for_batch]
-        batch_input_tensor = torch.stack(
-            [torch.as_tensor(s, device=self.device) for s in preprocessed_slices], dim=0
-        )
+        batch_input_tensor = torch.stack([torch.as_tensor(s, device=self.device, dtype=torch.float32) for s in preprocessed_slices], dim=0)
+        if self.verbose:
+            print(f"dtype of batch_input_tensor: {batch_input_tensor.dtype}")
         processed_batch = batch_input_tensor.float().permute(0, 3, 1, 2)
         processed_batch = (processed_batch - self.pixel_mean) / self.pixel_std
+        if self.verbose:
+            print(f"dtype of processed_batch: {processed_batch.dtype}")
+            print(f"dtype of model's first parameter: {next(self.model.parameters()).dtype}")
         with torch.no_grad():
             batch_embeddings = self.model.image_encoder(processed_batch)
             generated_masks = []
@@ -434,17 +437,20 @@ class SAHISAM:
                 points = batch_points[i]
                 input_points = self.transform.apply_coords(points, slice_img.shape[:2])
                 input_labels = np.ones(len(input_points), dtype=np.int32)
+
                 input_points_torch = torch.as_tensor(
-                    input_points, device=self.device
+                    input_points, device=self.device, dtype=torch.float32
                 ).unsqueeze(0)
                 input_labels_torch = torch.as_tensor(
-                    input_labels, device=self.device
+                    input_labels, device=self.device, dtype=torch.int64
                 ).unsqueeze(0)
+
                 sparse_embeddings, dense_embeddings = self.model.prompt_encoder(
                     points=(input_points_torch, input_labels_torch),
                     boxes=None,
                     masks=None,
                 )
+
                 low_res_masks, _ = self.model.mask_decoder(
                     image_embeddings=image_embedding.unsqueeze(0),
                     image_pe=self.model.prompt_encoder.get_dense_pe(),
@@ -452,6 +458,7 @@ class SAHISAM:
                     dense_prompt_embeddings=dense_embeddings,
                     multimask_output=False,
                 )
+
                 input_size_tuple = self.transform.apply_image(slice_img).shape[:2]
                 original_size_tuple = slice_img.shape[:2]
                 final_mask_torch = self._postprocess_masks_manual(

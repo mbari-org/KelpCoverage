@@ -17,22 +17,21 @@ classifiers = [
 ]
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
-
 dependencies = [
-    "pandas",
-    "matplotlib",
-    "shapely",
-    "numpy",
-    "torch",
-    "tqdm",
-    "segment-anything-py",
-    "sahi",
-    "ultralytics",
-    "opencv-python",
-    "tator",
-    "urllib3",
-    "geopandas",
-    "contextily",
+    "pandas==2.2.2",
+    "matplotlib==3.10.0",
+    "shapely==2.1.1",
+    "numpy==2.0.2",
+    "torch==2.8.0",
+    "tqdm==4.67.1",
+    "segment-anything-py==1.0.1",
+    "sahi==0.11.34",
+    "ultralytics==8.3.202",
+    "opencv-python==4.11.0.86",
+    "tator==1.5.12",
+    "urllib3==2.5.0",
+    "geopandas==1.1.1",
+    "contextily==1.6.2",
 ]
 
 [project.urls]
