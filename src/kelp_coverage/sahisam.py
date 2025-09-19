@@ -420,6 +420,7 @@ class SAHISAM:
         # https://github.com/facebookresearch/segment-anything/blob/dca509fe793f601edb92606367a655c15ac00fdf/segment_anything/modeling/sam.py#L130
         if not slices_for_batch:
             return []
+
         preprocessed_slices = [self.transform.apply_image(s) for s in slices_for_batch]
         batch_input_tensor = torch.stack([torch.as_tensor(s, device=self.device, dtype=torch.float32) for s in preprocessed_slices], dim=0)
         if self.verbose:
