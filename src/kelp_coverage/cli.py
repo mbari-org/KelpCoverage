@@ -17,6 +17,10 @@ from .heatmap import generate_heatmap
 
 
 def _generate_run_hash(args: argparse.Namespace) -> str:
+    """
+    Generates a unique hash based on the algorithmic parameters of the run.
+    This ensures that experiments with different settings are saved to separate directories.
+    """
     hash_key_args = {
         "slice_size": args.slice_size,
         "slice_overlap": args.slice_overlap,
@@ -35,19 +39,26 @@ def _generate_run_hash(args: argparse.Namespace) -> str:
         "fallback_brightness_threshold": args.fallback_brightness_threshold,
         "fallback_distance_threshold": args.fallback_distance_threshold,
         "hierarchical": args.hierarchical,
+        # Note: kelp_confidence_threshold is excluded from the hash
+        # because we test multiple thresholds in a single run.
+        "use_post_processing": getattr(args, "use_post_processing", False),
+        "morph_kernel_size": getattr(args, "morph_kernel_size", 3),
+        "blur_pre_merge": getattr(args, "blur_pre_merge", False),
+        "blur_post_merge": getattr(args, "blur_post_merge", False),
+        "blur_kernel_size": getattr(args, "blur_kernel_size", 7),
+        "blur_sigma": getattr(args, "blur_sigma", 1.5),
     }
     if args.hierarchical:
         hash_key_args.update(
             {
                 "hierarchical_slice_size": args.hierarchical_slice_size,
-                "use_erosion_merge": args.use_erosion_merge,
-                "erosion_kernel_size": args.erosion_kernel_size,
+                "merge_strategy": args.merge_strategy,
                 "use_color_validation": args.use_color_validation,
-                "color_validation_threshold": args.color_validation_threshold,
                 "merge_color_threshold": args.merge_color_threshold,
                 "merge_lightness_threshold": args.merge_lightness_threshold,
             }
         )
+    
     sorted_args = dict(sorted(hash_key_args.items()))
     args_string = json.dumps(sorted_args, sort_keys=True)
     return hashlib.sha256(args_string.encode()).hexdigest()[:8]
@@ -65,18 +76,30 @@ def _save_pixel_data(
 ) -> None:
     if not loc_to_pixel:
         return
-    pixel_data = [
+
+    new_pixel_data = [
         {"location": loc, "L": p[0], "A": p[1], "B": p[2]}
         for loc, p in loc_to_pixel.items()
         if p
     ]
-    if not pixel_data:
-        print("No pixel data to save.")
+    if not new_pixel_data:
+        print("No new pixel data to save.")
         return
-    df = pd.DataFrame(pixel_data)
-    df.to_csv(csv_path, index=False)
-    print(f"Pixel values saved to {csv_path}")
+    new_df = pd.DataFrame(new_pixel_data)
 
+    if os.path.exists(csv_path):
+        try:
+            existing_df = pd.read_csv(csv_path)
+            updated_locations = new_df['location'].tolist()
+            existing_df = existing_df[~existing_df['location'].isin(updated_locations)]
+            combined_df = pd.concat([existing_df, new_df], ignore_index=True)
+        except pd.errors.EmptyDataError:
+            combined_df = new_df
+    else:
+        combined_df = new_df
+        
+    combined_df.to_csv(csv_path, index=False)
+    print(f"Pixel values updated in {csv_path}")
 
 def _load_pixel_data(csv_path: str) -> Dict[str, Tuple[int, int, int]]:
     if not os.path.exists(csv_path):
@@ -100,7 +123,7 @@ def _get_image_paths(args: argparse.Namespace, site_path: str) -> List[str]:
         paths = [
             os.path.join(site_path, f)
             for f in os.listdir(site_path)
-            if f.lower().endswith(".jpg")
+            if f.lower().endswith((".jpg", ".jpeg", ".png"))
         ]
         paths.sort()
         if args.count != -1:
@@ -145,15 +168,6 @@ def _process_site(
         print(f"No images found for site: {site}")
         return
 
-    if image_paths:
-        full_name = os.path.basename(image_paths[0])
-        parts = full_name.split("_")
-        if len(parts) >= 3:
-            parsed_site_name = parts[2]
-        else:
-            parsed_site_name = None
-        run_args_dict["site_name"] = parsed_site_name
-
     water_lab = loc_to_pixel[site]
 
     try:
@@ -182,6 +196,9 @@ def _process_site(
         slice_viz_max_size=args.slice_viz_max_size,
         coverage_only=args.coverage_only,
         overwrite=args.overwrite,
+        generate_fine_heatmap=args.generate_fine_heatmap,
+        generate_coarse_heatmap=args.generate_coarse_heatmap,
+        generate_merged_heatmap=args.generate_merged_heatmap,
     )
 
 
@@ -249,9 +266,10 @@ def _run_debug(args: argparse.Namespace) -> None:
         uniformity_std_threshold=args.uniformity_std_threshold,
         uniform_grid_thresh=args.uniform_grid_thresh,
         water_grid_thresh=args.water_grid_thresh,
-        points_per_grid=args.points_per_grid,
+        points_per_grid=getattr(args, 'points_per_grid', 10),
         fallback_brightness_threshold=args.fallback_brightness_threshold,
         fallback_distance_threshold=args.fallback_distance_threshold,
+        kelp_confidence_threshold=args.kelp_confidence_threshold[0], # Use first for debug
     )
     for image_path in args.image_path:
         if not os.path.exists(image_path):
@@ -297,409 +315,87 @@ def main() -> None:
         dest="command", help="Available commands", required=True
     )
 
-    base_parser = argparse.ArgumentParser(add_help=False)
+    sam_model_parser = argparse.ArgumentParser(add_help=False)
+    sam_model_parser.add_argument("--sam-checkpoint", type=str, default="mobile_sam.pt", help="Path to the downloaded SAM model checkpoint.")
+    sam_model_parser.add_argument("--use-mobile-sam", action=argparse.BooleanOptionalAction, default=True, help="Use the lightweight MobileSAM model.")
+    sam_model_parser.add_argument("--sam-model-type", type=str, default="vit_h", help="Model type for standard SAM (e.g., vit_h, vit_l, vit_b).")
+    sam_model_parser.add_argument("--slice-size", type=int, default=1024, help="Size of the slices generated by SAHI.")
+    sam_model_parser.add_argument("--slice-overlap", type=float, default=0.2, help="Overlap ratio between adjacent slices (0.0 to 1.0).")
+    sam_model_parser.add_argument("--padding", type=int, default=0, help="Pixel padding to add to each slice before processing.")
+    sam_model_parser.add_argument("--clahe", action="store_true", help="Apply CLAHE to images before processing.")
+    sam_model_parser.add_argument("--downsample-factor", type=float, default=1.0, help="Factor by which to downsample the image.")
+    sam_model_parser.add_argument("--pixel-csv", type=str, default="pixel_values.csv", help="Path to the CSV file storing representative LAB pixel values.")
+    sam_model_parser.add_argument("--num-points", type=int, default=3, help="Number of seed points provided to SAM for segmentation.")
+    sam_model_parser.add_argument("--threshold", type=int, default=20, help="Threshold for LAB color distance to identify water pixels.")
+    sam_model_parser.add_argument("--threshold-max", type=int, default=20, help="Maximum LAB color threshold to search up to.")
+    sam_model_parser.add_argument("--final-point-strategy", type=str, default="poisson_disk", choices=["poisson_disk", "center_bias", "random"], help="Algorithm for selecting the final prompt points.")
+    sam_model_parser.add_argument("--grid-size", type=int, default=64, help="Pixel size of the grid used for initial point filtering.")
+    sam_model_parser.add_argument("--uniformity-check", action=argparse.BooleanOptionalAction, default=True, help="Enable/disable the grid uniformity check.")
+    sam_model_parser.add_argument("--uniformity-std-threshold", type=float, default=4.0, help='Standard deviation threshold for a grid cell to be "uniform".')
+    sam_model_parser.add_argument("--uniform-grid-thresh", type=float, default=0.98, help="Percentage of uniform grids required to shortcut SAM.")
+    sam_model_parser.add_argument("--water-grid-thresh", type=float, default=0.98, help="Percentage of water-colored grids required to shortcut SAM.")
+    sam_model_parser.add_argument("--fallback-brightness-threshold", type=float, default=100.0, help="[FALLBACK] Brightness threshold for water classification.")
+    sam_model_parser.add_argument("--fallback-distance-threshold", type=float, default=55.0, help="[FALLBACK] LAB color distance threshold for water classification.")
+    sam_model_parser.add_argument("--kelp-confidence-threshold", type=float, nargs='+', default=[0.5], help="One or more confidence thresholds for classifying a pixel as KELP (0.0 to 1.0).")
 
-    # Base Parser
-    # Model and Slicing Arguments
-    base_parser.add_argument(
-        "--sam-checkpoint",
-        type=str,
-        default="mobile_sam.pt",
-        help="Path to the downloaded SAM model checkpoint. Defaults to MobileSAM model",
-    )
-    base_parser.add_argument(
-        "--use-mobile-sam",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Use the lightweight MobileSAM model (default). Use --no-use-mobile-sam for the original SAM model.",
-    )
-    base_parser.add_argument(
-        "--sam-model-type",
-        type=str,
-        default="vit_h",
-        help="Model type for standard SAM (e.g., vit_h, vit_l, vit_b). Ignored if using MobileSAM.",
-    )
-    base_parser.add_argument(
-        "--slice-size",
-        type=int,
-        default=1024,
-        help="Size of the slices generated by SAHI.",
-    )
-    base_parser.add_argument(
-        "--slice-overlap",
-        type=float,
-        default=0.2,
-        help="Overlap ratio between adjacent slices (0.0 to 1.0).",
-    )
-    base_parser.add_argument(
-        "--padding",
-        type=int,
-        default=0,
-        help="Pixel padding to add to each slice before processing.",
-    )
+    general_parser = argparse.ArgumentParser(add_help=False)
+    general_parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
 
-    # Pre-processing Arguments
-    base_parser.add_argument(
-        "--clahe",
-        action="store_true",
-        help="Apply Contrast Limited Adaptive Histogram Equalization (CLAHE) to images before processing.",
-    )
-    base_parser.add_argument(
-        "--downsample-factor",
-        type=float,
-        default=1.0,
-        help="Factor by which to downsample the image (e.g., 2.0 for half size).",
-    )
+    setup_parser = subparsers.add_parser("setup", parents=[general_parser], help="Download images and compute representative water pixel for each site.")
+    setup_parser.add_argument("--tator-csv", type=str, default="tator_data.csv", help="Path to the image CSV file.")
+    setup_parser.add_argument("--tator-token", required=True, type=str, help="API token for Tator.")
+    setup_parser.add_argument("--images", type=int, default=-1, help="Number of images to download per site. -1 for all.")
+    setup_parser.add_argument("--start-idx", type=int, help="Optional start index for images to process from CSV.")
+    setup_parser.add_argument("--end-idx", type=int, help="Optional end index for images to process from CSV.")
+    setup_parser.add_argument("--visualize", action="store_true", help="Display histograms of the LAB color channels.")
 
-    # Point Selection and Filtering Arguments
-    base_parser.add_argument(
-        "--pixel-csv",
-        type=str,
-        default="pixel_values.csv",
-        help="Path to the CSV file storing representative LAB pixel values for each site.",
-    )
-    base_parser.add_argument(
-        "--num-points",
-        type=int,
-        default=3,
-        help="Number of seed points provided to SAM for segmentation.",
-    )
-    base_parser.add_argument(
-        "--threshold",
-        type=int,
-        default=20,
-        help="Threshold for LAB color distance to identify water pixels.",
-    )
-    base_parser.add_argument(
-        "--threshold-max",
-        type=int,
-        default=20,
-        help="Maximum LAB color threshold to search up to if no points are found.",
-    )
+    analyze_parser = subparsers.add_parser("analyze", parents=[general_parser, sam_model_parser], help="Run the kelp segmentation analysis.")
+    analyze_parser.add_argument("--site", type=str, help="Specify a specific site to process. Processes all sites if omitted.")
+    analyze_parser.add_argument("--tator-csv", type=str, required=True, help="Required path to the CSV to link results with metadata.")
+    analyze_parser.add_argument("--images", type=str, help="A comma-separated list of specific image filenames to process.")
+    analyze_parser.add_argument("--count", type=int, default=-1, help="Number of images to randomly select per site. -1 for all.")
+    analyze_parser.add_argument("--gpu-batch-size", type=int, default=32, help="Maximum number of slices to send to the GPU in a single batch.")
+    analyze_parser.add_argument("--generate-overlay", action="store_true", help="Generate and save a transparent overlay of the kelp mask.")
+    analyze_parser.add_argument("--generate-slice-viz", action="store_true", help="Generate a grid visualization of segmented slices.")
+    analyze_parser.add_argument("--slice-viz-max-size", type=int, default=256, help="Maximum dimension for slices in visualization grid.")
+    analyze_parser.add_argument("--generate-threshold-viz", action="store_true", help="Generate threshold visualization for each slice.")
+    analyze_parser.add_argument("--hierarchical", action=argparse.BooleanOptionalAction, default=True, help="Use a two-pass hierarchical method.")
+    analyze_parser.add_argument("--hierarchical-slice-size", type=int, default=4096, help="[HIERARCHICAL] Slice size for the coarse pass.")
+    analyze_parser.add_argument("--generate-erosion-viz", action="store_true", help="[HIERARCHICAL] Generate a visualization of the erosion merge effect.")
+    analyze_parser.add_argument("--generate-component-viz", action="store_true", help="[HIERARCHICAL] Generate a visualization of the fine and coarse masks.")
+    analyze_parser.add_argument("--use-color-validation", action=argparse.BooleanOptionalAction, default=True, help="[HIERARCHICAL] Use color validation in merge.")
+    analyze_parser.add_argument("--generate-merge-viz", action="store_true", help="[HIERARCHICAL] Generate a heatmap of the merge disagreement area.")
+    analyze_parser.add_argument("--merge-color-threshold", type=int, default=15, help="[HIERARCHICAL] LAB color distance threshold for merge validation.")
+    analyze_parser.add_argument("--merge-lightness-threshold", type=float, default=75.0, help="[HIERARCHICAL] Lightness (L*) threshold for merge validation.")
+    analyze_parser.add_argument("--overwrite", action="store_true", help="Overwrite existing results for a site.")
+    analyze_parser.add_argument("--coverage-only", action="store_true", help="Only compute and save coverage values.")
+    analyze_parser.add_argument("--generate-fine-heatmap", action="store_true", help="[HIERARCHICAL] Generate a heatmap of the fine pass confidence.")
+    analyze_parser.add_argument("--generate-coarse-heatmap", action="store_true", help="[HIERARCHICAL] Generate a heatmap of the coarse pass confidence.")
+    analyze_parser.add_argument("--generate-merged-heatmap", action="store_true", help="[HIERARCHICAL] Generate a heatmap of the final merged confidence.")
+    analyze_parser.add_argument("--merge-strategy", type=str, default="kelp-based", choices=["kelp-based", "average", "water-based"], help="[HIERARCHICAL] Strategy for merging fine and coarse passes. 'kelp-based' is the original behavior.")
+    analyze_parser.add_argument("--use-post-processing", action=argparse.BooleanOptionalAction, default=False, help="Enable morphological opening to clean the final mask.")
+    analyze_parser.add_argument("--morph-kernel-size", type=int, default=3, help="[POST-PROCESSING] Kernel size for morphological opening.")
+    analyze_parser.add_argument("--blur-pre-merge", action="store_true", help="[HIERARCHICAL] Apply Gaussian blur to fine/coarse confidence maps BEFORE merging.")
+    analyze_parser.add_argument("--blur-post-merge", action="store_true", help="Apply Gaussian blur to the final confidence map BEFORE thresholding.")
+    analyze_parser.add_argument("--blur-kernel-size", type=int, default=7, help="Kernel size (width and height) for the Gaussian blur. Must be an odd number.")
+    analyze_parser.add_argument("--blur-sigma", type=float, default=1.5, help="Standard deviation for the Gaussian blur.")
 
-    base_parser.add_argument(
-        "--final-point-strategy",
-        type=str,
-        default="poisson_disk",
-        choices=["poisson_disk", "center_bias", "random"],
-        help="Algorithm for selecting the final prompt points.",
-    )
-    base_parser.add_argument(
-        "--grid-size",
-        type=int,
-        default=64,
-        help="Pixel size of the grid used for initial point filtering.",
-    )
-    base_parser.add_argument(
-        "--uniformity-check",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Enable/disable the grid uniformity check during point selection.",
-    )
-    base_parser.add_argument(
-        "--uniformity-std-threshold",
-        type=float,
-        default=4.0,
-        help='Standard deviation threshold for a grid cell to be considered "uniform".',
-    )
-
-    # Shortcut & Fallback Arguments
-    base_parser.add_argument(
-        "--uniform-grid-thresh",
-        type=float,
-        default=0.98,
-        help="Percentage of uniform grids required to shortcut SAM.",
-    )
-    base_parser.add_argument(
-        "--water-grid-thresh",
-        type=float,
-        default=0.98,
-        help="Percentage of water-colored grids required to shortcut SAM.",
-    )
-
-    base_parser.add_argument(
-        "--fallback-brightness-threshold",
-        type=float,
-        default=100.0,
-        help="[FALLBACK] Brightness threshold to classify a slice as water if no points are found.",
-    )
-    base_parser.add_argument(
-        "--fallback-distance-threshold",
-        type=float,
-        default=55.0,
-        help="[FALLBACK] LAB color distance threshold to classify a slice as water if no points are found.",
-    )
-
-    # General Arguments
-    base_parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Verbose output"
-    )
-
-    # Setup Parser
-    setup_parser = subparsers.add_parser(
-        "setup",
-        help="Download images and compute representative water pixel for each site.",
-    )
-    setup_parser.add_argument(
-        "--tator-csv",
-        type=str,
-        default="tator_data.csv",
-        help="Path to the image CSV file.",
-    )
-    setup_parser.add_argument(
-        "--tator-token", required=True, type=str, help="API token for Tator."
-    )
-    setup_parser.add_argument(
-        "--images",
-        type=int,
-        default=-1,
-        help="Number of images to download per site. -1 for all images (default).",
-    )
-    setup_parser.add_argument(
-        "--start-idx",
-        type=int,
-        help="Optional start index for images to process from CSV.",
-    )
-    setup_parser.add_argument(
-        "--end-idx", type=int, help="Optional end index for images to process from CSV."
-    )
-    setup_parser.add_argument(
-        "--visualize",
-        action="store_true",
-        help="Display histograms of the LAB color channels for each site.",
-    )
-    setup_parser.add_argument(
-        "--verbose",
-        type=str,
-        default="tator_data.csv",
-        help="Verbose output.",
-    )
-
-    # Analysis Parser
-    analyze_parser = subparsers.add_parser(
-        "analyze",
-        parents=[base_parser],
-        help="Run the kelp segmentation analysis on a directory of images.",
-    )
-    # Input Specification
-    analyze_parser.add_argument(
-        "--site",
-        type=str,
-        help="Specify specific site to process. Processes all sites if omitted.",
-    )
-    analyze_parser.add_argument(
-        "--tator-csv",
-        type=str,
-        required=True,
-        help="Required path to the CSV to link results with metadata.",
-    )
-    analyze_parser.add_argument(
-        "--images",
-        type=str,
-        help="A comma-separated list of specific image filenames to process.",
-    )
-    analyze_parser.add_argument(
-        "--count",
-        type=int,
-        default=-1,
-        help="Number of images to randomly select and process from each site. -1 for all images(default).",
-    )
-    analyze_parser.add_argument(
-        "--gpu-batch-size",
-        type=int,
-        default=32,
-        help="Maximum number of slices to send to the GPU in a single batch to prevent memory errors.",
-    )
-
-    # Output & Visualization
-    analyze_parser.add_argument(
-        "--generate-overlay",
-        action="store_true",
-        help="Generate and save a transparent overlay of the kelp mask on the original image.",
-    )
-    analyze_parser.add_argument(
-        "--generate-slice-viz",
-        action="store_true",
-        help="Generate a grid visualization of all slices containing seed points and segmentations.",
-    )
-    analyze_parser.add_argument(
-        "--slice-viz-max-size",
-        type=int,
-        default=256,
-        help="Maximum dimension for slices in visualization grid.",
-    )
-    analyze_parser.add_argument(
-        "--generate-threshold-viz",
-        action="store_true",
-        help="Generate threshold visualization for each slice.",
-    )
-
-    # Hierarchical Method
-    analyze_parser.add_argument(
-        "--hierarchical",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Use a two-pass hierarchical method (default). Use --no-hierarchical to disable.",
-    )
-    analyze_parser.add_argument(
-        "--hierarchical-slice-size",
-        type=int,
-        default=4096,
-        help="[HIERARCHICAL] Slice size for the coarse pass.",
-    )
-
-    # Hierarchical Merging: Erosion
-    analyze_parser.add_argument(
-        "--use-erosion-merge",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="[HIERARCHICAL] Use erosion on the coarse mask by default. Use --no-use-erosion-merge to disable.",
-    )
-    analyze_parser.add_argument(
-        "--erosion-kernel-size",
-        type=int,
-        default=51,
-        help="[HIERARCHICAL] Kernel size for the erosion merge.",
-    )
-    analyze_parser.add_argument(
-        "--generate-erosion-viz",
-        action="store_true",
-        help="[HIERARCHICAL] Generate a visualization of the erosion merge effect.",
-    )
-    analyze_parser.add_argument(
-        "--generate-component-viz",
-        action="store_true",
-        help="[HIERARCHICAL] Generate a visualization of the fine and coarse masks overlayed.",
-    )
-
-    # Hierarchical Merging: Color Validation
-    analyze_parser.add_argument(
-        "--use-color-validation",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="[HIERARCHICAL] Use color validation by default. Use --no-use-color-validation to disable.",
-    )
-    analyze_parser.add_argument(
-        "--color-validation-threshold",
-        type=int,
-        default=50,
-        help="[HIERARCHICAL] LAB distance threshold for color validation.",
-    )
-    analyze_parser.add_argument(
-        "--generate-merge-viz",
-        action="store_true",
-        help="[HIERARCHICAL] Generate a heatmap visualization of the disagreement area during mask merging.",
-    )
-    analyze_parser.add_argument(
-        "--merge-color-threshold",
-        type=int,
-        default=15,
-        help="[HIERARCHICAL] LAB color distance threshold for validating kelp in the merge disagreement zone.",
-    )
-    analyze_parser.add_argument(
-        "--merge-lightness-threshold",
-        type=float,
-        default=75.0,
-        help="[HIERARCHICAL] Lightness (L*) threshold for validating kelp in the merge disagreement zone.",
-    )
-
-    # Execution Control
-    analyze_parser.add_argument(
-        "--overwrite",
-        action="store_true",
-        help="Overwrite existing results for a site.",
-    )
-    analyze_parser.add_argument(
-        "--coverage-only",
-        action="store_true",
-        help="Only compute and save coverage values.",
-    )
-
-    # Debug Parser
-    debug_parser = subparsers.add_parser(
-        "debug-slice",
-        parents=[base_parser],
-        help="Detailed debug analysis on specific image slices.",
-    )
-    # Image Specification
-    debug_parser.add_argument(
-        "--image-path",
-        type=str,
-        required=True,
-        nargs="+",
-        help="One or more full paths to images to debug.",
-    )
-    debug_parser.add_argument(
-        "--slice-index",
-        type=int,
-        required=True,
-        nargs="+",
-        help="One or more slice indices to debug for each image.",
-    )
+    debug_parser = subparsers.add_parser("debug-slice", parents=[general_parser, sam_model_parser], help="Detailed debug analysis on specific image slices.")
+    debug_parser.add_argument("--image-path", type=str, required=True, nargs="+", help="One or more full paths to images to debug.")
+    debug_parser.add_argument("--slice-index", type=int, required=True, nargs="+", help="One or more slice indices to debug for each image.")
     debug_parser.add_argument("--site", type=str, required=True, help="Site name.")
+    debug_parser.add_argument("--override-threshold", type=int, help="Manually set LAB color threshold.")
+    debug_parser.add_argument("--points-per-grid", type=int, default=10, help="Number of candidate points to show per valid grid cell.")
+    debug_parser.add_argument("--heatmap", action="store_true", help="Generate threshold visualization of color distances.")
+    debug_parser.add_argument("--visualize-stages", action="store_true", help="Visualize the point filtering pipeline step-by-step.")
 
-    # Debugging Parameters
-    debug_parser.add_argument(
-        "--override-threshold", type=int, help="Manually set LAB color threshold."
-    )
-    debug_parser.add_argument(
-        "--points-per-grid",
-        type=int,
-        default=10,
-        help="Number of candidate points to show per valid grid cell in debug mode.",
-    )
-
-    # Visualization Options
-    debug_parser.add_argument(
-        "--heatmap",
-        action="store_true",
-        help="Generate threshold visualization of color distances.",
-    )
-    debug_parser.add_argument(
-        "--visualize-stages",
-        action="store_true",
-        help="Visualize the point filtering pipeline step-by-step.",
-    )
-
-    # Heatmap parser
-    heatmap_parser = subparsers.add_parser(
-        "heatmap", help="Generate a spatial heatmap from coverage data."
-    )
-    # I/O
-    heatmap_parser.add_argument(
-        "--coverage-data",
-        type=str,
-        required=True,
-        help="Path to the results.json file from an analysis run.",
-    )
-    heatmap_parser.add_argument(
-        "--output",
-        type=str,
-        help='Path to save the output heatmap image. Defaults to "results/heatmap/".',
-    )
-
-    # Display Options
-    heatmap_parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Verbose output"
-    )
-    heatmap_parser.add_argument(
-        "--grid-size", type=int, default=30, help="Size of heatmap grid cells."
-    )
-    heatmap_parser.add_argument(
-        "--show-grid-values",
-        action="store_true",
-        help="Show numerical coverage values on the grid cells.",
-    )
-    heatmap_parser.add_argument(
-        "--show-points",
-        action="store_true",
-        help="Show the location of data points on the map.",
-    )
-    heatmap_parser.add_argument(
-        "--show-point-labels",
-        action="store_true",
-        help="Show labels for the data points.",
-    )
+    heatmap_parser = subparsers.add_parser("heatmap", parents=[general_parser], help="Generate a spatial heatmap from coverage data.")
+    heatmap_parser.add_argument("--coverage-data", type=str, required=True, help="Path to the results.json file from an analysis run.")
+    heatmap_parser.add_argument("--output", type=str, help='Path to save the output heatmap image.')
+    heatmap_parser.add_argument("--grid-size", type=int, default=30, help="Size of heatmap grid cells.")
+    heatmap_parser.add_argument("--show-grid-values", action="store_true", help="Show numerical coverage values on the grid cells.")
+    heatmap_parser.add_argument("--show-points", action="store_true", help="Show the location of data points on the map.")
+    heatmap_parser.add_argument("--show-point-labels", action="store_true", help="Show labels for the data points.")
 
     args = parser.parse_args()
 
@@ -718,3 +414,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
