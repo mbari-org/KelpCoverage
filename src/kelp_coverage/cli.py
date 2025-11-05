@@ -140,6 +140,7 @@ def _setup_data(args: argparse.Namespace) -> None:
         start_idx=args.start_idx,
         end_idx=args.end_idx,
         visualize=args.visualize,
+        verbose=args.verbose,
     )
     _save_pixel_data(loc_to_pixel, pixel_csv_path)
 
