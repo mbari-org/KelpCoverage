@@ -1,0 +1,18 @@
+{
+    "model_type": "vit_t",
+    "slice_size": 1024,
+    "overlap_ratio": 0.2,
+    "padding": 0,
+    "threshold": 20.0,
+    "num_points": 3,
+    "strategy": "POISSON_DISK",
+    "thresholds": [0.5],
+    "clahe": false,
+    "batch_size": 16,
+    "grid_size": 32,
+    "uniformity_std_threshold": 10.0,
+    "apply_blur": false,
+    "blur_kernel": 7,
+    "blur_sigma": 1.5,
+    "use_matplotlib_viz": false
+}
