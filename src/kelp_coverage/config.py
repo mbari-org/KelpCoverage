@@ -1,12 +1,12 @@
 import json
 from pathlib import Path
-from kelp_coverage.core.errors import KelpFileNotFoundError
+from kelp_coverage.core.errors import KelpFileNotFoundError, KelpDirNotFoundError
 
 def get_config_dir():
     root = Path(__file__).parent.parent.parent
     config_dir = root / "configs"
     if not config_dir.exists():
-        raise KelpFileNotFoundError(str(config_dir))
+        raise KelpDirNotFoundError(str(config_dir))
     return config_dir
 
 def load_config_file(config_name):
