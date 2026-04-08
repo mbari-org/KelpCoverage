@@ -18,7 +18,6 @@ UNIFORM_GRID_THRESH      = 0.98  # fraction of uniform grids required for shortc
 WATER_GRID_THRESH        = 0.98  # fraction of water-colored grids required for shortcut
 THRESHOLD                = 20    # LAB distance threshold for water color match
 NUM_POINTS               = 3     # number of SAM prompt points per slice
-FINAL_POINT_STRATEGY     = "poisson_disk"  # "poisson_disk" | "center_bias" | "random"
 
 # Fallback
 FALLBACK_BRIGHTNESS_THRESHOLD = 100.0  # avg LAB L* above this → classify as water
